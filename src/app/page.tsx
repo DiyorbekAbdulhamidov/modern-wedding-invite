@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { Play, Disc, MapPin, Camera, GlassWater, Utensils, Heart, AlertCircle, Sparkles, BookHeart, CalendarHeart, CheckCircle, Mail } from 'lucide-react';
+import Link from 'next/link';
 
 // --- 1. HAQIQIY KABUTAR SVG ---
 const RealisticDoveSVG = ({ className }: { className?: string }) => (
@@ -427,7 +428,7 @@ const UltraLuxuryWedding: NextPage = () => {
             {/* FOOTER */}
             <footer className="py-10 text-center bg-[#111111] relative z-10 border-t border-[#C5A059]/30">
               <p className="font-['Montserrat'] text-[9px] tracking-[0.6em] text-[#C5A059] uppercase font-semibold">
-                WebLeaders Premium
+                Designed By <Link href={"https://webleaders.uz"}>WebLeaders</Link>
               </p>
               <p className="font-['Montserrat'] text-[7px] tracking-[0.2em] text-gray-500 uppercase mt-4">
                 Exclusive Wedding Digital Design
