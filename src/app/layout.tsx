@@ -12,9 +12,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Barcha mijozlar uchun tushaveradigan universal sarlavha va ta'rif
 export const metadata: Metadata = {
-  title: "Sardor & Amira | Premium Wedding Invitation",
-  description: "Premium white-themed wedding invitation landing page by WebLeaders.",
+  title: "Maxsus Taklifnoma",
+  description: "WebLeaders tomonidan tayyorlangan premium raqamli taklifnoma.",
 };
 
 export default function RootLayout({
