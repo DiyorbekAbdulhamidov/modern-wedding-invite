@@ -325,14 +325,19 @@ const ElegantBridalShower: NextPage = () => {
                 5. MANZIL (Piskent, Lola To'yxonasi)
             ========================================= */}
             <section className="py-24 px-6 bg-white relative z-10">
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className={`text-center px-6 max-w-[320px] mx-auto bg-white p-10 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border-[0.5px] border-[${goldColor}]/20`}>
-                <MapPin className={`w-6 h-6 text-[${goldColor}] mx-auto mb-5 opacity-80`} />
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className={`text-center px-6 max-w-[320px] mx-auto bg-white p-10 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border-[0.5px] border-[#C5A059]/20`}>
+                <MapPin className={`w-6 h-6 text-[#C5A059] mx-auto mb-5 opacity-80`} />
                 <h3 className="font-['Playfair_Display'] text-2xl text-[#222] mb-4 tracking-wide">Manzil</h3>
                 <p className="font-['Montserrat'] text-[11px] text-gray-600 font-light leading-relaxed mb-6">
-                  Toshkent viloyati, Piskent tumani,<br /> <span className="font-medium text-[#222]">Lola to'yxonasi</span>
+                  Toshkent viloyati, Piskent tumani, Bobur Mirzo ko'chasi,<br /> <span className="font-medium text-[#222]">Lola to'yxonasi</span>
                 </p>
-                {/* Lokatsiya silkasi kerak bo'lsa href ga yoziladi */}
-                <a href="#" className={`border-[0.5px] border-[#333] bg-transparent text-[#333] px-8 py-3.5 font-['Montserrat'] text-[8px] font-medium tracking-[0.2em] uppercase hover:bg-[#333] hover:text-white transition-colors duration-400 inline-block`}>
+                {/* 100% Aniq koordinatani ochadigan silka */}
+                <a
+                  href="https://www.google.com/maps?q=40.898729,69.350592"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`border-[0.5px] border-[#333] bg-transparent text-[#333] px-8 py-3.5 font-['Montserrat'] text-[8px] font-medium tracking-[0.2em] uppercase hover:bg-[#333] hover:text-white transition-colors duration-400 inline-block`}
+                >
                   Xaritada Ochish
                 </a>
               </motion.div>
