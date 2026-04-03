@@ -122,15 +122,15 @@ const UltraLuxuryWedding: NextPage = () => {
             >
               {/* Samoviy Bulutlar Foni */}
               <motion.div
-                className="absolute inset-0 z-0 opacity-[0.85] mix-blend-multiply"
+                className="absolute inset-0 z-0 opacity-[0.4] mix-blend-multiply"
                 style={{
-                  backgroundImage: "url('https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=1080&auto=format&fit=crop')",
+                  backgroundImage: "url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1080&auto=format&fit=crop')", // Yumshoqroq gul fon
                   backgroundSize: "cover",
                   backgroundPosition: "center",
-                  filter: "sepia(0.2) hue-rotate(-5deg) brightness(1.1) contrast(0.9)"
+                  filter: "sepia(0.1) hue-rotate(-10deg) brightness(1.2)"
                 }}
-                animate={{ scale: [1, 1.15], x: [0, -15] }}
-                transition={{ duration: 25, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
+                animate={{ scale: [1, 1.1], x: [0, -10] }}
+                transition={{ duration: 30, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/70 z-10 pointer-events-none"></div>
 
