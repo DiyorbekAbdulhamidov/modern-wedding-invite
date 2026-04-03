@@ -4,7 +4,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
-import { Play, Disc, MapPin, Camera, GlassWater, Utensils, Heart, AlertCircle, Sparkles, BookHeart, CheckCircle, Mail } from 'lucide-react';
+import { Play, Disc, MapPin, Camera, GlassWater, Utensils, Heart, AlertCircle, Sparkles, BookHeart, CheckCircle, Mail, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 // --- 1. HAQIQIY KABUTAR SVG ---
@@ -54,6 +54,8 @@ const UltraLuxuryWedding: NextPage = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
   const [rsvpStatus, setRsvpStatus] = useState<null | 'attending' | 'declined'>(null);
+  const [guestName, setGuestName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleStart = () => {
@@ -68,6 +70,44 @@ const UltraLuxuryWedding: NextPage = () => {
       if (isPlaying) audioRef.current.pause();
       else audioRef.current.play();
       setIsPlaying(!isPlaying);
+    }
+  };
+
+  // TELEGRAMGA YUBORISH FUNKSIYASI
+  const handleRSVPSubmit = async (status: 'attending' | 'declined') => {
+    if (!guestName.trim()) {
+      alert("Iltimos, ism-sharifingizni kiriting!");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const token = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
+
+    const statusText = status === 'attending' ? "✅ Qatnashadi" : "❌ Qatnashmaydi";
+    const message = `🎊 To'yga yangi javob!\n\n👤 Ism: ${guestName}\n📝 Holat: ${statusText}`;
+
+    try {
+      if (token && chatId) {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+          })
+        });
+      } else {
+        console.warn("Telegram Token yoki Chat ID topilmadi. .env faylini tekshiring.");
+      }
+      // Muvaffaqiyatli jo'natilgach, ekranda tasdiqni ko'rsatamiz
+      setRsvpStatus(status);
+    } catch (error) {
+      console.error(error);
+      alert("Xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -220,7 +260,7 @@ const UltraLuxuryWedding: NextPage = () => {
             </section>
 
             {/* =========================================
-                3. OTA-ONALAR MAKTUBI (Haqiqiy Qog'oz Vizuali)
+                3. OTA-ONALAR MAKTUBI
             ========================================= */}
             <section className="py-28 px-5 bg-[#FFFFFF] relative z-10">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16">
@@ -234,7 +274,6 @@ const UltraLuxuryWedding: NextPage = () => {
                 <div className="bg-[#FFFFFF] p-12 relative z-10 rounded-sm border-[0.5px] border-[#C5A059]/40 transform rotate-[0.5deg]">
                   <div className="absolute inset-[6px] border-[0.5px] border-[#C5A059]/20 pointer-events-none rounded-sm"></div>
 
-                  {/* Dabdabali SVG Ornament */}
                   <LuxuryOrnamentSVG className="w-32 mx-auto text-[#C5A059] mb-12 opacity-80" />
 
                   <p className="font-['Montserrat'] text-[9px] tracking-[0.5em] text-[#C5A059] uppercase mb-12 font-semibold">Qadrli Yaqinlarimiz!</p>
@@ -309,32 +348,50 @@ const UltraLuxuryWedding: NextPage = () => {
             </section>
 
             {/* =========================================
-                6. RSVP (Tashrif Tasdig'i)
+                6. RSVP (Tashrif Tasdig'i & Telegram Ulanish)
             ========================================= */}
             <section className="py-24 px-6 bg-[#FAFAFA] relative z-10 border-y border-gray-100">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-[340px] mx-auto">
                 <Mail className="w-8 h-8 text-[#C5A059] mx-auto mb-6 opacity-80" />
                 <h3 className="font-['Playfair_Display'] text-3xl text-[#111] mb-4">Tashrif Tasdig'i</h3>
                 <p className="font-['Montserrat'] text-[10px] text-gray-500 font-light leading-relaxed mb-10 uppercase tracking-[0.2em]">
-                  Lutfan o'z tashrifingizni bildiring
+                  Lutfan o'z ismingizni kiritib, tashrifingizni bildiring
                 </p>
 
                 <div className="bg-white p-8 border-[0.5px] border-[#C5A059]/40 shadow-[0_10px_30px_rgba(0,0,0,0.03)] rounded-sm">
                   <AnimatePresence mode="wait">
                     {!rsvpStatus ? (
-                      <motion.div key="form" exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="space-y-4">
-                        <button
-                          onClick={() => setRsvpStatus('attending')}
-                          className="w-full py-4 bg-[#111] text-white font-['Montserrat'] text-[10px] tracking-[0.3em] uppercase hover:bg-[#C5A059] transition-colors"
-                        >
-                          Quvonch bilan boraman
-                        </button>
-                        <button
-                          onClick={() => setRsvpStatus('declined')}
-                          className="w-full py-4 bg-transparent border-[0.5px] border-gray-300 text-gray-600 font-['Montserrat'] text-[10px] tracking-[0.3em] uppercase hover:border-[#C5A059] hover:text-[#C5A059] transition-colors"
-                        >
-                          Afsuski, bora olmayman
-                        </button>
+                      <motion.div key="form" exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="space-y-5">
+
+                        {/* Ism kiritish maydoni */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={guestName}
+                            onChange={(e) => setGuestName(e.target.value)}
+                            placeholder="Ism-sharifingiz"
+                            className="w-full bg-transparent border-b border-gray-300 text-center py-3 text-[#111] placeholder:text-gray-400 focus:outline-none focus:border-[#C5A059] transition-colors font-['Playfair_Display'] text-[18px] italic"
+                          />
+                        </div>
+
+                        {/* Tasdiqlash Tugmalari */}
+                        <div className="pt-4 space-y-4">
+                          <button
+                            onClick={() => handleRSVPSubmit('attending')}
+                            disabled={isSubmitting}
+                            className="w-full py-4 bg-[#111] text-white font-['Montserrat'] text-[10px] tracking-[0.3em] uppercase hover:bg-[#C5A059] transition-colors flex justify-center items-center h-12"
+                          >
+                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin text-[#C5A059]" /> : "Quvonch bilan boraman"}
+                          </button>
+                          <button
+                            onClick={() => handleRSVPSubmit('declined')}
+                            disabled={isSubmitting}
+                            className="w-full py-4 bg-transparent border-[0.5px] border-gray-300 text-gray-600 font-['Montserrat'] text-[10px] tracking-[0.3em] uppercase hover:border-[#C5A059] hover:text-[#C5A059] transition-colors flex justify-center items-center h-12"
+                          >
+                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin text-[#C5A059]" /> : "Afsuski, bora olmayman"}
+                          </button>
+                        </div>
+
                       </motion.div>
                     ) : (
                       <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="py-6 flex flex-col items-center">
