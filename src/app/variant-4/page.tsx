@@ -5,6 +5,8 @@ import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { Play, Disc, MapPin, CheckCircle, Loader2 } from 'lucide-react';
+import type { Variants } from 'framer-motion';
+
 import Link from 'next/link';
 
 // Twinkling star component
@@ -114,9 +116,17 @@ const CelestialWedding: NextPage = () => {
     setIsSubmitting(false);
   };
 
-  const cosmicFade = {
+
+  const cosmicFade: Variants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 1.1,
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+      },
+    },
   };
 
   const SPACE = '#060B18';

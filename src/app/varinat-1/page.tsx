@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { Play, Disc, MapPin, CheckCircle, Loader2 } from 'lucide-react';
+import type { Variants } from 'framer-motion';
 import Link from 'next/link';
 
 const GoldSpark = ({ x, delay, duration, size }: { x: number; delay: number; duration: number; size: number }) => (
@@ -88,9 +89,17 @@ const NoirWedding: NextPage = () => {
     setIsSubmitting(false);
   };
 
-  const fadeIn = {
+
+  const fadeIn: Variants = {
     hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 1.1,
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+      },
+    },
   };
 
   return (

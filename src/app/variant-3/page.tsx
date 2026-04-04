@@ -4,6 +4,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
+import type { Variants } from 'framer-motion';
 import { Play, Disc, MapPin, CheckCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -111,9 +112,17 @@ const IkatWedding: NextPage = () => {
     setIsSubmitting(false);
   };
 
-  const royalFade = {
+
+  const royalFade: Variants = {
     hidden: { opacity: 0, y: 35 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 1.1,
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+      },
+    },
   };
 
   const NAVY = '#0F0C2E';
