@@ -446,6 +446,7 @@ const CelestialWedding: NextPage = () => {
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={cosmicFade} className="relative z-10">
                 <p className="font-sacramento mb-12" style={{ fontSize: '3rem', color: STAR_GOLD, ...glowStyle(STAR_GOLD) }}>
                   Bayramga qadar...
+                  {/*  */}
                 </p>
                 <div className="flex justify-center gap-3">
                   {[{ l: 'KUN', v: timeLeft.kun }, { l: 'SOAT', v: timeLeft.soat }, { l: 'DAQIQA', v: timeLeft.daqiqa }, { l: 'SONIYA', v: timeLeft.soniya }].map((item, i) => (
