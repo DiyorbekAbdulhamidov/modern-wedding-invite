@@ -346,7 +346,7 @@ const ElegantBridalShower: NextPage = () => {
             {/* =========================================
                 6. RSVP (Tashrif Tasdig'i & Telegram Ulanish)
             ========================================= */}
-            <section className={`py-24 px-6 bg-[${softBg}] relative z-10 border-y border-gray-100/50`}>
+            {/* <section className={`py-24 px-6 bg-[${softBg}] relative z-10 border-y border-gray-100/50`}>
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-[340px] mx-auto">
                 <Flower2 className={`w-7 h-7 text-[${goldColor}] mx-auto mb-5 opacity-70`} />
                 <h3 className="font-['Playfair_Display'] text-[28px] text-[#222] mb-3">Tashrifingiz</h3>
@@ -397,7 +397,7 @@ const ElegantBridalShower: NextPage = () => {
                   </AnimatePresence>
                 </div>
               </motion.div>
-            </section>
+            </section> */}
 
             {/* =========================================
                 7. TAYMER
