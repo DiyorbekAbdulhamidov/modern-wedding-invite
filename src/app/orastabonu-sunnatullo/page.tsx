@@ -331,9 +331,7 @@ const UltraLuxuryWedding: NextPage = () => {
               </motion.div> */}
             </section>
 
-            {/* =========================================
-                6. RSVP (Tashrif tasdig'i)
-            ========================================= */}
+
             <section className="py-24 px-6 bg-[#FAFAFA] relative z-10 border-y border-gray-100">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-[340px] mx-auto">
                 <Mail className="w-8 h-8 text-[#C5A059] mx-auto mb-6 opacity-80" />
