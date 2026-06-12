@@ -5,12 +5,12 @@ import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import type { Variants } from 'framer-motion';
-import { Play, Disc, MapPin, CheckCircle, Loader2 } from 'lucide-react';
+import { Play, MapPin, CheckCircle, Loader2, Calendar, Copy, Volume2, VolumeX, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 // Ikat diamond ornament
 const IkatDiamond = ({ size = 50, color = '#D4AF37', fill = 'rgba(212,175,55,0.15)' }: { size?: number; color?: string; fill?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 50 50" fill="none">
+  <svg width={size} height={size} viewBox="0 0 50 50" fill="none" className="transition-transform duration-700 hover:scale-110">
     <polygon points="25,2 48,25 25,48 2,25" fill={fill} stroke={color} strokeWidth="0.8" />
     <polygon points="25,10 40,25 25,40 10,25" fill="none" stroke={color} strokeWidth="0.5" opacity="0.6" />
     <polygon points="25,18 32,25 25,32 18,25" fill={color} fillOpacity="0.4" />
@@ -21,16 +21,14 @@ const IkatDiamond = ({ size = 50, color = '#D4AF37', fill = 'rgba(212,175,55,0.1
 
 // Ikat pattern border row
 const IkatBorder = ({ color = '#D4AF37', bg = 'transparent', count = 7 }: { color?: string; bg?: string; count?: number }) => (
-  <div className="flex items-center justify-center" style={{ background: bg, overflow: 'hidden' }}>
+  <div className="flex items-center justify-center select-none py-2" style={{ background: bg, overflow: 'hidden' }}>
     {Array.from({ length: count }, (_, i) => (
-      <svg key={i} width="48" height="48" viewBox="0 0 48 48" fill="none">
-        <polygon points="24,2 46,24 24,46 2,24" fill="rgba(212,175,55,0.1)" stroke={color} strokeWidth="0.6" />
-        <polygon points="24,10 38,24 24,38 10,24" fill="rgba(212,175,55,0.08)" stroke={color} strokeWidth="0.4" opacity="0.6" />
-        <polygon points="24,18 30,24 24,30 18,24" fill={color} fillOpacity="0.3" />
-        <circle cx="24" cy="2" r="1.5" fill={color} fillOpacity="0.5" />
-        <circle cx="24" cy="46" r="1.5" fill={color} fillOpacity="0.5" />
-        <circle cx="2" cy="24" r="1.5" fill={color} fillOpacity="0.5" />
-        <circle cx="46" cy="24" r="1.5" fill={color} fillOpacity="0.5" />
+      <svg key={i} width="44" height="44" viewBox="0 0 48 48" fill="none" className="opacity-80">
+        <polygon points="24,2 46,24 24,46 2,24" fill="rgba(212,175,55,0.06)" stroke={color} strokeWidth="0.6" />
+        <polygon points="24,10 38,24 24,38 10,24" fill="rgba(212,175,55,0.04)" stroke={color} strokeWidth="0.4" opacity="0.6" />
+        <polygon points="24,18 30,24 24,30 18,24" fill={color} fillOpacity="0.25" />
+        <circle cx="24" cy="2" r="1" fill={color} fillOpacity="0.4" />
+        <circle cx="24" cy="46" r="1" fill={color} fillOpacity="0.4" />
       </svg>
     ))}
   </div>
@@ -38,29 +36,23 @@ const IkatBorder = ({ color = '#D4AF37', bg = 'transparent', count = 7 }: { colo
 
 // Ornamental gate arch SVG
 const OrnamentalGate = () => (
-  <svg viewBox="0 0 320 380" fill="none" className="w-full h-full">
+  <svg viewBox="0 0 320 380" fill="none" className="w-full h-full drop-shadow-[0_0_10px_rgba(212,175,55,0.2)]">
     <rect x="1" y="1" width="318" height="378" stroke="#D4AF37" strokeWidth="0.8" opacity="0.4" />
     <rect x="8" y="8" width="304" height="364" stroke="#D4AF37" strokeWidth="0.4" opacity="0.25" />
-    {/* Top arch */}
-    <path d="M40 100 C40 20, 280 20, 280 100" stroke="#D4AF37" strokeWidth="1" fill="none" opacity="0.6" />
-    <path d="M55 100 C55 35, 265 35, 265 100" stroke="#D4AF37" strokeWidth="0.5" fill="none" opacity="0.35" />
-    {/* Corner diamonds */}
+    <path d="M40 100 C40 20, 280 20, 280 100" stroke="#D4AF37" strokeWidth="1.2" fill="none" opacity="0.7" />
+    <path d="M55 100 C55 35, 265 35, 265 100" stroke="#D4AF37" strokeWidth="0.6" fill="none" opacity="0.4" />
     {[[20, 20], [300, 20], [20, 360], [300, 360]].map(([cx, cy], i) => (
-      <polygon key={i} points={`${cx},${cy - 10} ${cx + 10},${cy} ${cx},${cy + 10} ${cx - 10},${cy}`} fill="#D4AF37" fillOpacity="0.5" />
+      <polygon key={i} points={`${cx},${cy - 8} ${cx + 8},${cy} ${cx},${cy + 8} ${cx - 8},${cy}`} fill="#D4AF37" fillOpacity="0.6" />
     ))}
-    {/* Side pillars */}
     <line x1="40" y1="100" x2="40" y2="370" stroke="#D4AF37" strokeWidth="0.8" opacity="0.4" />
     <line x1="280" y1="100" x2="280" y2="370" stroke="#D4AF37" strokeWidth="0.8" opacity="0.4" />
-    {/* Mid ornaments on pillars */}
     {[150, 220, 290].map(y => (
       <g key={y}>
-        <polygon points={`32,${y} 40,${y - 8} 48,${y} 40,${y + 8}`} fill="rgba(212,175,55,0.3)" />
-        <polygon points={`272,${y} 280,${y - 8} 288,${y} 280,${y + 8}`} fill="rgba(212,175,55,0.3)" />
+        <polygon points={`34,${y} 40,${y - 6} 46,${y} 40,${y + 6}`} fill="rgba(212,175,55,0.4)" />
+        <polygon points={`274,${y} 280,${y - 6} 286,${y} 280,${y + 6}`} fill="rgba(212,175,55,0.4)" />
       </g>
     ))}
-    {/* Top arch ornament */}
-    <polygon points="160,30 172,42 160,54 148,42" fill="rgba(212,175,55,0.5)" stroke="#D4AF37" strokeWidth="0.5" />
-    <circle cx="160" cy="42" r="4" fill="#D4AF37" opacity="0.4" />
+    <polygon points="160,26 170,36 160,46 150,36" fill="rgba(212,175,55,0.6)" stroke="#D4AF37" strokeWidth="0.5" />
   </svg>
 );
 
@@ -70,58 +62,81 @@ const IkatWedding: NextPage = () => {
   const [rsvpStatus, setRsvpStatus] = useState<null | 'attending' | 'declined'>(null);
   const [guestName, setGuestName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ kun: 0, soat: 0, daqiqa: 0, soniya: 0 });
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    if (!isStarted) return;
     const target = new Date('2026-04-25T13:00:00').getTime();
     const t = setInterval(() => {
       const d = target - Date.now();
-      if (d > 0) setTimeLeft({
-        kun: Math.floor(d / 86400000), soat: Math.floor((d % 86400000) / 3600000),
-        daqiqa: Math.floor((d % 3600000) / 60000), soniya: Math.floor((d % 60000) / 1000),
-      });
+      if (d > 0) {
+        setTimeLeft({
+          kun: Math.floor(d / 86400000),
+          soat: Math.floor((d % 86400000) / 3600000),
+          daqiqa: Math.floor((d % 3600000) / 60000),
+          soniya: Math.floor((d % 60000) / 1000),
+        });
+      }
     }, 1000);
     return () => clearInterval(t);
-  }, [isStarted]);
+  }, []);
 
   const handleStart = () => {
     setIsStarted(true);
-    audioRef.current?.play().then(() => setIsPlaying(true)).catch(() => { });
+    if (audioRef.current) {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => console.log("Audio playback blocked:", err));
+    }
   };
 
   const toggleMusic = () => {
     if (!audioRef.current) return;
-    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
-    else { audioRef.current.play().then(() => setIsPlaying(true)).catch(() => { }); }
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => { });
+    }
   };
 
   const handleRSVP = async (status: 'attending' | 'declined') => {
-    if (!guestName.trim()) { alert('Ismingizni kiriting!'); return; }
+    if (!guestName.trim()) {
+      alert('Iltimos, ism-sharifingizni kiriting.');
+      return;
+    }
     setIsSubmitting(true);
     const token = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
     const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
     if (token && chatId) {
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: `👑 To'y RSVP (Ulug'bek & Kamola)\n👤 ${guestName}\n📝 ${status === 'attending' ? '✅ Keladi' : '❌ Kelmaydi'}` }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `👑 To'y RSVP\n👤 Mehmon: ${guestName}\n📝 Holati: ${status === 'attending' ? '✅ Quvonch bilan boradi' : '❌ Afsuski bora olmaydi'}`
+        }),
       }).catch(() => { });
     }
     setRsvpStatus(status);
     setIsSubmitting(false);
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText("Bohodirjon To'yxonasi, Piskent tumani");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const royalFade: Variants = {
-    hidden: { opacity: 0, y: 35 },
+    hidden: { opacity: 0, y: 40 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 1.1,
-        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-      },
+      transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
     },
   };
 
@@ -131,297 +146,315 @@ const IkatWedding: NextPage = () => {
   const EMERALD = '#144D30';
   const GOLD = '#D4AF37';
   const IVORY = '#F5E6C8';
-  const TEXT_LIGHT = '#E8D8A8';
 
   return (
-    <div style={{ background: NAVY, minHeight: '100svh', color: IVORY }} className="flex justify-center overflow-hidden">
+    <div style={{ background: NAVY, minHeight: '100svh', color: IVORY }} className="flex justify-center overflow-hidden antialiased selection:bg-[#rgba(212,175,55,0.3)]">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&family=Oswald:wght@200;300;400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Oswald:wght@200;400;500&display=swap');
         .font-cinzel { font-family: 'Cinzel', serif; }
         .font-lora { font-family: 'Lora', serif; }
         .font-oswald { font-family: 'Oswald', sans-serif; }
-        @keyframes pulse-gold { 0%,100%{opacity:0.6;} 50%{opacity:1;} }
+        
+        .gold-shimmer {
+          background: linear-gradient(90deg, #D4AF37 0%, #FFF5D1 50%, #D4AF37 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: shimmer 4s linear infinite;
+        }
+        @keyframes shimmer {
+          0% { background-position: 0% center; }
+          100% { background-position: 200% center; }
+        }
+        .luxury-blur {
+          backdrop-filter: blur(12px);
+          background: rgba(255, 255, 255, 0.03);
+          border: 0.5px solid rgba(212, 175, 55, 0.2);
+        }
       `}</style>
 
-      <div className="w-full max-w-[460px] relative overflow-x-hidden">
-        <Head><title>Ulug'bek & Kamola | To'y Bazmi</title></Head>
-        <audio ref={audioRef} loop preload="auto"><source src="/die.mp3" type="audio/mpeg" /></audio>
+      <div className="w-full max-w-[460px] relative overflow-x-hidden shadow-2xl shadow-black/80">
+        <Head>
+          <title>Ulug'bek & Kamola | Taklifnoma</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        </Head>
 
-        {/* SPLASH */}
+        <audio ref={audioRef} loop preload="auto">
+          <source src="/die.mp3" type="audio/mpeg" />
+        </audio>
+
+        {/* SPLASH ENTRY */}
         <AnimatePresence>
           {!isStarted && (
-            <motion.div className="fixed inset-0 z-[300] flex flex-col items-center justify-center overflow-hidden"
+            <motion.div className="fixed inset-0 z-[300] flex flex-col items-center justify-center px-6"
               style={{ background: NAVY }}
-              exit={{ opacity: 0, scale: 1.08 }}
-              transition={{ duration: 1.6, ease: [0.77, 0, 0.175, 1] }}>
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1] }}>
 
-              {/* Animated background ikat grid */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
-                {Array.from({ length: 8 }, (_, row) => (
-                  <div key={row} className="flex" style={{ marginTop: row === 0 ? -24 : 0 }}>
-                    {Array.from({ length: 10 }, (_, col) => (
-                      <svg key={col} width="50" height="50" viewBox="0 0 50 50" fill="none">
-                        <polygon points="25,2 48,25 25,48 2,25" fill="none" stroke={GOLD} strokeWidth="0.5" />
-                        <polygon points="25,14 36,25 25,36 14,25" fill="rgba(212,175,55,0.3)" />
-                      </svg>
-                    ))}
-                  </div>
+              {/* Grid Background */}
+              <div className="absolute inset-0 pointer-events-none opacity-[0.04] grid grid-cols-6 gap-2 p-4">
+                {Array.from({ length: 48 }).map((_, i) => (
+                  <div key={i} className="aspect-square border border-[#D4AF37] rotate-45" />
                 ))}
               </div>
 
-              <motion.div className="relative z-20 flex flex-col items-center cursor-pointer" onClick={handleStart}>
-                <motion.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.8, ease: 'easeOut' }}>
-                  {/* Royal monogram */}
-                  <div className="relative flex items-center justify-center" style={{ width: 200, height: 200 }}>
-                    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" className="absolute">
-                      <polygon points="100,5 195,100 100,195 5,100" fill={`${NAVY}cc`} stroke={GOLD} strokeWidth="1" />
-                      <polygon points="100,18 182,100 100,182 18,100" fill="none" stroke={GOLD} strokeWidth="0.5" opacity="0.5" />
-                      <polygon points="100,35 165,100 100,165 35,100" fill="none" stroke={GOLD} strokeWidth="0.3" opacity="0.3" />
-                      {[0, 90, 180, 270].map(a => (
-                        <g key={a} transform={`rotate(${a} 100 100)`}>
-                          <polygon points="100,8 107,15 100,22 93,15" fill={GOLD} fillOpacity="0.6" />
-                        </g>
-                      ))}
-                    </svg>
-                    <div className="relative z-10 text-center">
-                      <span className="font-cinzel block" style={{ fontSize: '3rem', color: GOLD, letterSpacing: '0.2em', lineHeight: 1.1 }}>U</span>
-                      <span className="font-lora italic block" style={{ fontSize: '1.2rem', color: 'rgba(212,175,55,0.5)', lineHeight: 1 }}>&</span>
-                      <span className="font-cinzel block" style={{ fontSize: '3rem', color: GOLD, letterSpacing: '0.2em', lineHeight: 1.1 }}>K</span>
-                    </div>
+              <motion.div className="relative z-20 flex flex-col items-center text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.5 }}>
+
+                {/* Royal Monogram Container */}
+                <div className="relative flex items-center justify-center w-52 h-52 mb-8 animate-[pulse_4s_infinite_ease-in-out]">
+                  <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none" className="absolute top-0 left-0">
+                    <polygon points="100,5 195,100 100,195 5,100" fill="rgba(15,12,46,0.8)" stroke={GOLD} strokeWidth="1" />
+                    <polygon points="100,15 185,100 100,185 15,100" fill="none" stroke={GOLD} strokeWidth="0.5" opacity="0.5" />
+                    <circle cx="100" cy="100" r="45" stroke={GOLD} strokeWidth="0.5" strokeDasharray="4 4" opacity="0.6" />
+                  </svg>
+                  <div className="relative z-10">
+                    <span className="font-cinzel block text-5xl font-semibold tracking-widest text-[#D4AF37] gold-shimmer">U & K</span>
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 1 }} className="text-center mt-6 mb-10">
-                  <p className="font-oswald" style={{ fontSize: 9, letterSpacing: '0.8em', textTransform: 'uppercase', color: GOLD, fontWeight: 300 }}>Visol Bazmi</p>
-                  <p className="font-oswald mt-2" style={{ fontSize: 8, letterSpacing: '0.5em', color: 'rgba(245,230,200,0.4)', textTransform: 'uppercase', fontWeight: 200 }}>25 . 04 . 2026</p>
-                </motion.div>
+                <p className="font-oswald text-[10px] tracking-[0.8em] uppercase text-[#D4AF37] mb-2 font-light">Visol Bazmi Takvimi</p>
+                <p className="font-oswald text-xs tracking-[0.4em] text-ivory/60 mb-12">25.04.2026</p>
 
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}
-                  className="flex items-center gap-3 px-10 py-4 transition-all duration-500 hover:opacity-80"
-                  style={{ border: `0.5px solid ${GOLD}`, background: `rgba(212,175,55,0.08)` }}>
-                  <Play size={12} color={GOLD} />
-                  <span className="font-oswald" style={{ fontSize: 9, letterSpacing: '0.6em', textTransform: 'uppercase', color: GOLD, fontWeight: 300 }}>Taklifnomani Ochish</span>
-                </motion.div>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleStart}
+                  className="group relative flex items-center gap-4 px-8 py-4 overflow-hidden transition-all duration-300 active:scale-95 luxury-blur hover:border-[#D4AF37]/60"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                  <Play size={14} fill={GOLD} stroke="none" className="group-hover:scale-110 transition-transform" />
+                  <span className="font-oswald text-[10px] tracking-[0.5em] uppercase text-[#D4AF37] font-medium">Taklifnomani Ochish</span>
+                </motion.button>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* MUSIC BTN */}
+        {/* PREMIUM AUDIO CONTROLLER */}
         {isStarted && (
-          <motion.button onClick={toggleMusic} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="fixed bottom-8 right-6 z-[150] w-12 h-12 flex items-center justify-center active:scale-95 transition-transform"
-            style={{ background: NAVY2, border: `0.5px solid rgba(212,175,55,0.4)`, clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)' }}>
-            {isPlaying ? <Disc className="animate-spin" size={16} color={GOLD} style={{ animationDuration: '4s' }} /> : <Play size={12} color={GOLD} style={{ marginLeft: 2 }} />}
+          <motion.button
+            onClick={toggleMusic}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed bottom-6 right-6 z-[200] w-14 h-14 flex flex-col items-center justify-center rounded-full bg-[#161240]/90 border border-[#D4AF37]/40 shadow-xl backdrop-blur-md active:scale-90 transition-transform"
+          >
+            {isPlaying ? (
+              <div className="flex items-end gap-[2px] h-4">
+                <span className="w-[2px] bg-[#D4AF37] rounded-full animate-[pulse_0.5s_infinite_alternate]" style={{ height: '60%' }} />
+                <span className="w-[2px] bg-[#D4AF37] rounded-full animate-[pulse_0.7s_infinite_alternate_0.2s]" style={{ height: '100%' }} />
+                <span className="w-[2px] bg-[#D4AF37] rounded-full animate-[pulse_0.4s_infinite_alternate_0.1s]" style={{ height: '40%' }} />
+                <span className="w-[2px] bg-[#D4AF37] rounded-full animate-[pulse_0.6s_infinite_alternate_0.3s]" style={{ height: '80%' }} />
+              </div>
+            ) : (
+              <VolumeX size={16} stroke={GOLD} />
+            )}
+            <span className="text-[7px] font-oswald text-[#D4AF37] tracking-widest mt-1 font-light">{isPlaying ? "Muzika" : "Jim"}</span>
           </motion.button>
         )}
 
-        {/* MAIN */}
+        {/* MAIN COMPONENT CONTENT */}
         {isStarted && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
 
-            {/* === HERO === */}
-            <section className="relative text-center overflow-hidden" style={{ minHeight: '100svh', background: NAVY }}>
-              {/* Background ikat pattern */}
-              <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{ overflow: 'hidden' }}>
-                {Array.from({ length: 10 }, (_, row) => (
-                  <div key={row} className="flex" style={{ marginLeft: row % 2 ? -24 : 0 }}>
-                    {Array.from({ length: 11 }, (_, col) => (
-                      <svg key={col} width="46" height="46" viewBox="0 0 46 46" fill="none" style={{ flexShrink: 0 }}>
-                        <polygon points="23,1 45,23 23,45 1,23" fill="none" stroke={GOLD} strokeWidth="0.8" />
-                        <polygon points="23,11 35,23 23,35 11,23" fill={GOLD} fillOpacity="0.4" />
-                      </svg>
-                    ))}
+            {/* HEROSCAPE */}
+            <section className="relative text-center flex flex-col justify-between items-center px-6 py-12 min-h-screen" style={{ background: NAVY }}>
+              <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay">
+                {Array.from({ length: 12 }).map((_, r) => (
+                  <div key={r} className="flex justify-center gap-4 my-2 opacity-40">
+                    {Array.from({ length: 6 }).map((_, c) => <div key={c} className="w-8 h-8 border border-white rotate-45" />)}
                   </div>
                 ))}
               </div>
 
-              <div className="relative z-10 flex flex-col items-center justify-center px-6 py-20" style={{ minHeight: '100svh' }}>
-                <IkatBorder count={9} />
+              <IkatBorder count={9} />
 
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-                  className="font-oswald my-10" style={{ fontSize: 8, letterSpacing: '0.8em', textTransform: 'uppercase', color: GOLD, fontWeight: 300 }}>
-                  Oila Qurish Tantanasi
-                </motion.p>
+              <div className="my-auto w-full flex flex-col items-center">
+                <p className="font-oswald text-[9px] tracking-[0.7em] uppercase text-[#D4AF37] mb-8 font-light">Lutfan Taklif Etamiz</p>
 
-                {/* Gate frame with image */}
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 1.2 }}
-                  className="relative mx-auto" style={{ width: '75%', maxWidth: 280, aspectRatio: '4/5' }}>
-                  <div className="absolute inset-0 pointer-events-none z-20">
+                {/* Elegant Gate Framework Frame */}
+                <div className="relative w-64 aspect-[4/5] mb-8 group">
+                  <div className="absolute inset-0 z-20 pointer-events-none transform group-hover:scale-[1.01] transition-transform duration-1000">
                     <OrnamentalGate />
                   </div>
-                  <div className="w-full h-full overflow-hidden" style={{ clipPath: 'polygon(15% 0, 85% 0, 100% 15%, 100% 100%, 0 100%, 0 15%)', background: NAVY2 }}>
-                    <img src="/dreamwedding.jpg" alt="Couple" className="w-full h-full object-cover object-top" style={{ filter: 'brightness(0.85) sepia(0.15) hue-rotate(10deg)' }} />
-                    <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${NAVY}aa, transparent 40%)` }} />
+                  <div className="w-full h-full p-2" style={{ clipPath: 'polygon(15% 0, 85% 0, 100% 12%, 100% 100%, 0 100%, 0 12%)' }}>
+                    <div className="w-full h-full overflow-hidden bg-[#161240]">
+                      <img
+                        src="/dreamwedding.jpg"
+                        alt="Couple Portrait"
+                        className="w-full h-full object-cover object-top filter brightness-[0.75] sepia-[0.2] contrast-[1.05] transition-transform duration-[4000] ease-out group-hover:scale-105"
+                      />
+                    </div>
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 1 }} className="mt-8">
-                  <h1 className="font-cinzel" style={{ fontSize: 'clamp(2.2rem, 8vw, 3.2rem)', color: IVORY, letterSpacing: '0.25em', fontWeight: 400 }}>
-                    ULUG'BEK
-                  </h1>
-                  <div className="flex items-center justify-center gap-3 my-3">
-                    <div style={{ height: 0.5, width: 30, background: GOLD }} />
-                    <IkatDiamond size={20} color={GOLD} fill={`rgba(212,175,55,0.3)`} />
-                    <div style={{ height: 0.5, width: 30, background: GOLD }} />
-                  </div>
-                  <h1 className="font-cinzel" style={{ fontSize: 'clamp(2.2rem, 8vw, 3.2rem)', color: IVORY, letterSpacing: '0.25em', fontWeight: 400 }}>
-                    KAMOLA
-                  </h1>
-                  <p className="font-oswald mt-6" style={{ fontSize: 11, letterSpacing: '0.5em', color: 'rgba(245,230,200,0.5)', textTransform: 'uppercase', fontWeight: 200 }}>
-                    25 · 04 · 2026
-                  </p>
-                </motion.div>
+                <h1 className="font-cinzel text-3xl font-medium tracking-[0.2em] text-white">ULUG'BEK</h1>
+                <div className="flex items-center justify-center gap-4 my-4 w-full opacity-60">
+                  <div className="h-[0.5px] w-12 bg-gradient-to-r from-transparent to-[#D4AF37]" />
+                  <IkatDiamond size={16} color={GOLD} fill="rgba(212,175,55,0.4)" />
+                  <div className="h-[0.5px] w-12 bg-gradient-to-l from-transparent to-[#D4AF37]" />
+                </div>
+                <h1 className="font-cinzel text-3xl font-medium tracking-[0.2em] text-white">KAMOLA</h1>
 
-                <IkatBorder count={9} />
+                <p className="font-oswald text-xs tracking-[0.5em] text-[#D4AF37] mt-8 font-light">25 APREL · 2026</p>
               </div>
+
+              <IkatBorder count={9} />
             </section>
 
-            {/* === RUBY SECTION: LETTER === */}
-            <div style={{ height: 4, background: `linear-gradient(90deg, ${EMERALD}, ${RUBY}, ${GOLD}, ${RUBY}, ${EMERALD})` }} />
-            <section className="py-20 px-6 relative overflow-hidden" style={{ background: RUBY }}>
-              <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
-                {Array.from({ length: 6 }, (_, row) => (
-                  <div key={row} className="flex" style={{ marginLeft: row % 2 ? -24 : 0 }}>
-                    {Array.from({ length: 11 }, (_, col) => (
-                      <svg key={col} width="46" height="46" viewBox="0 0 46 46" fill="none" style={{ flexShrink: 0 }}>
-                        <polygon points="23,1 45,23 23,45 1,23" fill="none" stroke={GOLD} strokeWidth="1" />
-                        <polygon points="23,14 32,23 23,32 14,23" fill="rgba(212,175,55,0.5)" />
-                      </svg>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade} className="max-w-[340px] mx-auto text-center relative z-10">
-                <div className="flex justify-center gap-3 mb-8">
-                  {[...Array(3)].map((_, i) => <IkatDiamond key={i} size={24} color={GOLD} fill="rgba(212,175,55,0.2)" />)}
+            {/* THE INVITATION MESSAGE */}
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
+            <section className="py-24 px-6 text-center relative overflow-hidden" style={{ background: RUBY }}>
+              <div className="absolute inset-0 bg-black/10 pointer-events-none" />
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={royalFade} className="max-w-[340px] mx-auto space-y-8 relative z-10">
+                <div className="flex justify-center gap-2 opacity-70">
+                  {[...Array(3)].map((_, i) => <IkatDiamond key={i} size={20} color={GOLD} fill="transparent" />)}
                 </div>
-                <p className="font-oswald mb-8" style={{ fontSize: 8, letterSpacing: '0.7em', textTransform: 'uppercase', color: GOLD, fontWeight: 300 }}>Ehtiromli Mehmonlarimiz</p>
-                <p className="font-lora italic px-2" style={{ fontSize: 15, color: 'rgba(245,230,200,0.85)', lineHeight: 2.5 }}>
-                  "Farzand — ota-ona uchun Yaratganning eng buyuk in'omi. Bugun shu in'omlarning kamolini ko'rish nasib etmoqda.
+
+                <p className="font-oswald text-[9px] tracking-[0.6em] uppercase text-[#D4AF37] font-light">Qadrli Mehmonimiz</p>
+
+                <p className="font-lora text-base leading-loose text-white/90 px-2 font-light">
+                  "Farzand — ota-ona hayotining mazmuni, Yaratganning cheksiz marhamati. Bugun niyatlarimiz ijobat bo'lib, jondan aziz farzandlarimiz kamolini ko'rish baxtiga musharrafmiz."
                 </p>
-                <p className="font-cinzel my-8" style={{ fontSize: 15, color: GOLD, letterSpacing: '0.2em' }}>ULUG'BEK & KAMOLAXON</p>
-                <p className="font-lora italic px-2" style={{ fontSize: 15, color: 'rgba(245,230,200,0.85)', lineHeight: 2.5 }}>
-                  visol to'yini muborak duolaringiz bilan bezashingizni so'raymiz."
+
+                <h3 className="font-cinzel text-sm tracking-[0.25em] text-[#D4AF37] font-semibold py-2">ULUG'BEK & KAMOLAXON</h3>
+
+                <p className="font-lora text-base leading-loose text-white/90 px-2 font-light">
+                  Ushbu muqaddas rishtalar bog'lanadigan qutlug' ayyomda siz azizlarimizning samimiy duolaringiz va hamrohligingiz biz uchun yuksak sharafdir.
                 </p>
-                <div className="flex justify-center gap-3 mt-8">
-                  {[...Array(3)].map((_, i) => <IkatDiamond key={i} size={24} color={GOLD} fill="rgba(212,175,55,0.2)" />)}
+
+                <div className="flex justify-center gap-2 opacity-70">
+                  {[...Array(3)].map((_, i) => <IkatDiamond key={i} size={20} color={GOLD} fill="transparent" />)}
                 </div>
               </motion.div>
             </section>
-            <div style={{ height: 4, background: `linear-gradient(90deg, ${EMERALD}, ${RUBY}, ${GOLD}, ${RUBY}, ${EMERALD})` }} />
 
-            {/* === EMERALD SECTION: PROGRAM === */}
-            <section className="py-20 px-6 relative overflow-hidden" style={{ background: EMERALD }}>
-              <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
-                {Array.from({ length: 6 }, (_, row) => (
-                  <div key={row} className="flex" style={{ marginLeft: row % 2 ? -24 : 0 }}>
-                    {Array.from({ length: 11 }, (_, col) => (
-                      <svg key={col} width="46" height="46" viewBox="0 0 46 46" fill="none" style={{ flexShrink: 0 }}>
-                        <polygon points="23,1 45,23 23,45 1,23" fill="none" stroke={GOLD} strokeWidth="1" />
-                        <polygon points="23,14 32,23 23,32 14,23" fill="rgba(212,175,55,0.4)" />
-                      </svg>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade} className="max-w-[340px] mx-auto relative z-10">
-                <div className="text-center mb-12">
-                  <IkatDiamond size={36} color={GOLD} fill="rgba(212,175,55,0.3)" />
-                  <h2 className="font-cinzel mt-4" style={{ fontSize: '1.6rem', color: IVORY, letterSpacing: '0.25em' }}>TANTANA DASTURI</h2>
+            {/* EVENT SCHEDULE (DASTUR) */}
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
+            <section className="py-24 px-6 relative overflow-hidden" style={{ background: EMERALD }}>
+              <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade} className="max-w-[350px] mx-auto relative z-10">
+                <div className="text-center mb-16">
+                  <IkatDiamond size={32} color={GOLD} fill="rgba(212,175,55,0.1)" />
+                  <h2 className="font-cinzel text-xl tracking-[0.3em] text-white mt-4 font-medium">TANTANA DASTURI</h2>
                 </div>
 
                 {[
-                  { time: 'Nahorgi Osh', t: '', event: 'Dasturxon Fayzi', desc: "Ertalabki palovga marhamat", color: GOLD },
-                  { time: '08:00', t: '', event: "Hatmi Qur'on", desc: "Qur'on tilovati va oq fotixa", color: GOLD },
-                  { time: '13:00', t: '', event: "To'y Bazmi", desc: '"Bohodirjon" To\'yxonasi', color: GOLD },
+                  { time: 'Nahorgi Osh', label: '07:00 - 09:00', event: 'Ertalabki Dasturxon', desc: "Yaqinlar davrasida milliy palov", edge: GOLD },
+                  { time: "Hatmi Qur'on", label: '08:00', event: "Duolar va Oq Fotixa", desc: "Kelin-kuyov baxti uchun Qur'on tilovati", edge: GOLD },
+                  { time: "To'y Bazmi", label: '13:00', event: "Nikoh Tantanasi", desc: 'Muhtasham "Bohodirjon" To\'yxonasi', edge: GOLD },
                 ].map((item, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                    className="flex items-center gap-5 mb-6 p-5 relative"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(212,175,55,0.2)', borderLeft: `3px solid ${item.color}` }}>
-                    <div className="flex-shrink-0">
-                      <IkatDiamond size={20} color={GOLD} fill="rgba(212,175,55,0.25)" />
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.15, duration: 0.8 }}
+                    className="luxury-blur p-6 mb-6 relative group hover:bg-white/[0.05] transition-all"
+                    style={{ borderLeft: `3px solid ${item.edge}` }}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="font-cinzel text-base font-semibold tracking-wider text-[#D4AF37]">{item.time}</span>
+                      <span className="font-oswald text-[10px] tracking-widest text-white/50">{item.label}</span>
                     </div>
-                    <div>
-                      <p className="font-cinzel" style={{ fontSize: 18, color: GOLD, letterSpacing: '0.1em', lineHeight: 1.2 }}>{item.time}</p>
-                      <p className="font-cinzel" style={{ fontSize: 11, color: IVORY, letterSpacing: '0.2em', marginTop: 2 }}>{item.event}</p>
-                      <p className="font-lora italic" style={{ fontSize: 12, color: 'rgba(245,230,200,0.5)', marginTop: 2 }}>{item.desc}</p>
-                    </div>
+                    <p className="font-cinzel text-[11px] tracking-widest text-white/90 mb-1">{item.event}</p>
+                    <p className="font-lora text-xs italic text-white/60 font-light">{item.desc}</p>
                   </motion.div>
                 ))}
               </motion.div>
             </section>
-            <div style={{ height: 4, background: `linear-gradient(90deg, ${EMERALD}, ${RUBY}, ${GOLD}, ${RUBY}, ${EMERALD})` }} />
 
-            {/* === VENUE === */}
-            <section className="py-20 px-6 relative" style={{ background: NAVY2 }}>
+            {/* GEO-LOCATION SECTION */}
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
+            <section className="py-24 px-6 relative" style={{ background: NAVY2 }}>
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade} className="max-w-[340px] mx-auto">
-                <div className="text-center p-10 relative" style={{ border: '0.5px solid rgba(212,175,55,0.35)' }}>
-                  <div className="absolute" style={{ inset: 8, border: '0.5px solid rgba(212,175,55,0.12)', pointerEvents: 'none' }} />
-                  {/* Corner diamonds */}
-                  {['-translate-x-2 -translate-y-2', 'translate-x-2 -translate-y-2 right-0', '-translate-x-2 translate-y-2 bottom-0', 'translate-x-2 translate-y-2 right-0 bottom-0'].map((t, i) => (
-                    <div key={i} className={`absolute transform ${t}`} style={{ top: i < 2 ? 0 : undefined, bottom: i >= 2 ? 0 : undefined, left: i % 2 === 0 ? 0 : undefined, right: i % 2 !== 0 ? 0 : undefined }}>
-                      <IkatDiamond size={16} color={GOLD} fill={`rgba(212,175,55,0.4)`} />
+                <div className="text-center p-8 relative border border-[#D4AF37]/30 bg-black/10">
+                  <div className="absolute inset-2 border border-[#D4AF37]/10 pointer-events-none" />
+
+                  {/* Corner Elements */}
+                  {['top-0 left-0 -translate-x-1 -translate-y-1', 'top-0 right-0 translate-x-1 -translate-y-1', 'bottom-0 left-0 -translate-x-1 translate-y-1', 'bottom-0 right-0 translate-x-1 translate-y-1'].map((pos, i) => (
+                    <div key={i} className={`absolute ${pos}`}>
+                      <IkatDiamond size={12} color={GOLD} fill={NAVY2} />
                     </div>
                   ))}
 
-                  <MapPin size={22} color={GOLD} style={{ margin: '0 auto 20px', opacity: 0.8 }} />
-                  <h3 className="font-cinzel mb-5" style={{ fontSize: 16, color: IVORY, letterSpacing: '0.35em' }}>MANZIL</h3>
-                  <p className="font-lora italic mb-4" style={{ fontSize: 14, color: 'rgba(245,230,200,0.6)', lineHeight: 1.9 }}>
-                    Toshkent viloyati, Piskent tumani
-                  </p>
-                  <p className="font-cinzel mb-8" style={{ fontSize: 13, color: GOLD, letterSpacing: '0.15em' }}>"BOHODIRJON" TO'YXONASI</p>
-                  <a href="https://maps.app.goo.gl/GEGwZe2Lk4HrmYHr5" target="_blank" rel="noopener noreferrer"
-                    className="font-oswald inline-block px-8 py-3 transition-all duration-400 hover:bg-[rgba(212,175,55,0.15)]"
-                    style={{ border: `0.5px solid ${GOLD}`, fontSize: 9, letterSpacing: '0.5em', textTransform: 'uppercase', color: GOLD, fontWeight: 300 }}>
-                    Xaritada Ochish
-                  </a>
+                  <MapPin size={24} stroke={GOLD} className="mx-auto mb-6 opacity-90 animate-bounce" />
+                  <h3 className="font-cinzel text-sm tracking-[0.4em] text-white mb-6 font-semibold">TO'YXONA MANZILI</h3>
+
+                  <p className="font-lora text-sm text-white/70 leading-relaxed mb-1 font-light">Toshkent viloyati,</p>
+                  <p className="font-lora text-sm text-white/70 leading-relaxed mb-4 font-light">Piskent tumani</p>
+                  <p className="font-cinzel text-sm text-[#D4AF37] tracking-[0.15em] mb-8 font-medium">"BOHODIRJON" TO'YXONASI</p>
+
+                  <div className="flex flex-col gap-3">
+                    <a href="https://maps.app.goo.gl/GEGwZe2Lk4HrmYHr5" target="_blank" rel="noopener noreferrer"
+                      className="font-oswald flex items-center justify-center gap-2 px-6 py-3 w-full border border-[#D4AF37] text-[10px] tracking-[0.4em] uppercase text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all font-medium">
+                      <span>Xaritadan ko'rish</span>
+                      <ExternalLink size={10} />
+                    </a>
+
+                    <button
+                      onClick={copyToClipboard}
+                      className="font-oswald flex items-center justify-center gap-2 px-6 py-3 w-full border border-white/20 text-[10px] tracking-[0.4em] uppercase text-white/60 hover:text-white transition-all font-light"
+                    >
+                      <Copy size={10} />
+                      <span>{copied ? "Nusxalandi!" : "Manzilni nusxalash"}</span>
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </section>
 
-            {/* === RSVP === */}
-            <div style={{ height: 4, background: `linear-gradient(90deg, ${EMERALD}, ${RUBY}, ${GOLD}, ${RUBY}, ${EMERALD})` }} />
-            <section className="py-20 px-6" style={{ background: NAVY }}>
+            {/* RSVP PLATFORM */}
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
+            <section className="py-24 px-6 relative" style={{ background: NAVY }}>
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade} className="max-w-[340px] mx-auto text-center">
-                <div className="flex justify-center gap-2 mb-6">
-                  <IkatDiamond size={28} color={RUBY} fill={`rgba(160,24,48,0.2)`} />
-                  <IkatDiamond size={36} color={GOLD} fill={`rgba(212,175,55,0.2)`} />
-                  <IkatDiamond size={28} color={EMERALD} fill={`rgba(20,77,48,0.2)`} />
+                <div className="flex justify-center gap-3 mb-6 opacity-60">
+                  <IkatDiamond size={24} color={RUBY} fill="transparent" />
+                  <IkatDiamond size={28} color={GOLD} fill="transparent" />
+                  <IkatDiamond size={24} color={EMERALD} fill="transparent" />
                 </div>
-                <h3 className="font-cinzel mb-3" style={{ fontSize: '1.4rem', color: IVORY, letterSpacing: '0.3em' }}>TASHRIF TASDIG'I</h3>
-                <p className="font-oswald mb-10" style={{ fontSize: 8, letterSpacing: '0.5em', textTransform: 'uppercase', color: 'rgba(245,230,200,0.4)', fontWeight: 200 }}>
-                  Ismingizni kiriting
-                </p>
 
-                <div className="p-8" style={{ border: '0.5px solid rgba(212,175,55,0.25)', background: 'rgba(255,255,255,0.03)' }}>
+                <h3 className="font-cinzel text-lg tracking-[0.25em] text-white mb-2 font-medium">TASHRIFNI TASDIQLASH</h3>
+                <p className="font-oswald text-[9px] tracking-[0.4em] uppercase text-white/40 mb-10 font-light">Sizni intizorlik bilan kutamiz</p>
+
+                <div className="luxury-blur p-8 rounded-none">
                   <AnimatePresence mode="wait">
                     {!rsvpStatus ? (
-                      <motion.div key="form" exit={{ opacity: 0 }} className="space-y-6">
-                        <input type="text" value={guestName} onChange={e => setGuestName(e.target.value)}
-                          placeholder="Ism-sharifingiz"
-                          className="font-lora italic w-full text-center py-3 focus:outline-none bg-transparent transition-colors"
-                          style={{ fontSize: 18, color: IVORY, borderBottom: '0.5px solid rgba(212,175,55,0.3)' } as any} />
-                        <div className="space-y-3 pt-3">
-                          <button onClick={() => handleRSVP('attending')} disabled={isSubmitting}
-                            className="font-oswald w-full flex justify-center items-center transition-all duration-300"
-                            style={{ height: 48, background: GOLD, color: NAVY, fontSize: 9, letterSpacing: '0.5em', textTransform: 'uppercase', fontWeight: 400 }}>
-                            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Quvonch bilan boraman'}
+                      <motion.div key="rsvp-form" exit={{ opacity: 0 }} className="space-y-6">
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={guestName}
+                            onChange={e => setGuestName(e.target.value)}
+                            placeholder="Ism-sharifingiz"
+                            className="font-lora italic w-full text-center py-3 bg-transparent border-b border-white/20 text-white placeholder:text-white/30 text-lg focus:outline-none focus:border-[#D4AF37] transition-colors"
+                          />
+                        </div>
+
+                        <div className="space-y-3 pt-4">
+                          <button
+                            onClick={() => handleRSVP('attending')}
+                            disabled={isSubmitting}
+                            className="font-oswald w-full flex justify-center items-center h-12 bg-[#D4AF37] text-[#0F0C2E] text-[10px] tracking-[0.4em] uppercase font-semibold hover:bg-[#FFF5D1] transition-colors disabled:opacity-50"
+                          >
+                            {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : 'Quvonch bilan boraman'}
                           </button>
-                          <button onClick={() => handleRSVP('declined')} disabled={isSubmitting}
-                            className="font-oswald w-full flex justify-center items-center transition-all duration-300"
-                            style={{ height: 48, border: `0.5px solid rgba(212,175,55,0.3)`, color: 'rgba(245,230,200,0.4)', fontSize: 9, letterSpacing: '0.5em', textTransform: 'uppercase', fontWeight: 200 }}>
-                            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Afsuski, bora olmayman'}
+
+                          <button
+                            onClick={() => handleRSVP('declined')}
+                            disabled={isSubmitting}
+                            className="font-oswald w-full flex justify-center items-center h-12 border border-white/20 text-white/60 text-[10px] tracking-[0.4em] uppercase font-light hover:border-white/40 transition-colors disabled:opacity-50"
+                          >
+                            {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : 'Afsuski, bora olmayman'}
                           </button>
                         </div>
                       </motion.div>
                     ) : (
-                      <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="py-8 flex flex-col items-center">
-                        <CheckCircle size={44} color={GOLD} style={{ marginBottom: 16 }} />
-                        <p className="font-lora italic" style={{ fontSize: 20, color: IVORY }}>Rahmat!</p>
-                        <p className="font-oswald mt-2" style={{ fontSize: 8, letterSpacing: '0.5em', textTransform: 'uppercase', color: `rgba(212,175,55,0.5)`, fontWeight: 200 }}>Javobingiz qabul qilindi</p>
+                      <motion.div key="rsvp-success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-6 flex flex-col items-center">
+                        <CheckCircle size={40} stroke={GOLD} className="mb-4" />
+                        <p className="font-lora italic text-xl text-white mb-2">Katta rahmat!</p>
+                        <p className="font-oswald text-[9px] tracking-[0.3em] uppercase text-[#D4AF37] font-light">Sizning javobingiz muvaffaqiyatli yetkazildi</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -429,62 +462,69 @@ const IkatWedding: NextPage = () => {
               </motion.div>
             </section>
 
-            {/* === COUNTDOWN === */}
-            <div style={{ height: 4, background: `linear-gradient(90deg, ${EMERALD}, ${RUBY}, ${GOLD}, ${RUBY}, ${EMERALD})` }} />
-            <section className="py-24 px-6 text-center" style={{ background: RUBY }}>
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade}>
-                <p className="font-lora italic mb-12" style={{ fontSize: '1.8rem', color: GOLD, opacity: 0.85 }}>Bayramga qadar...</p>
-                <div className="flex justify-center gap-2">
-                  {[{ l: 'KUN', v: timeLeft.kun }, { l: 'SOAT', v: timeLeft.soat }, { l: 'DAQIQA', v: timeLeft.daqiqa }, { l: 'SONIYA', v: timeLeft.soniya }].map((item, i) => (
-                    <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                      className="flex flex-col items-center py-5" style={{ width: 64, border: '0.5px solid rgba(212,175,55,0.3)', background: 'rgba(255,255,255,0.05)', clipPath: 'polygon(50% 0, 100% 15%, 100% 85%, 50% 100%, 0 85%, 0 15%)' }}>
-                      <span className="font-cinzel" style={{ fontSize: 24, color: GOLD, fontWeight: 500 }}>{item.v.toString().padStart(2, '0')}</span>
-                      <span className="font-oswald mt-2" style={{ fontSize: 7, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(245,230,200,0.5)', fontWeight: 200 }}>{item.l}</span>
-                    </motion.div>
+            {/* INTERACTIVE COUNTDOWN TIMELINE */}
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
+            <section className="py-24 px-6 text-center relative" style={{ background: RUBY }}>
+              <div className="absolute inset-0 bg-black/10 pointer-events-none" />
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade} className="relative z-10">
+                <p className="font-lora text-xl text-[#D4AF37] italic mb-10 font-light">Go'zal lahzalarga oz qoldi...</p>
+
+                <div className="flex justify-center gap-3">
+                  {[
+                    { label: 'KUN', val: timeLeft.kun },
+                    { label: 'SOAT', val: timeLeft.soat },
+                    { label: 'MINUT', val: timeLeft.daqiqa },
+                    { label: 'SEKUND', val: timeLeft.soniya }
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center justify-center py-4 w-16 h-20 border border-[#D4AF37]/30 bg-black/10"
+                      style={{ clipPath: 'polygon(50% 0%, 100% 15%, 100% 85%, 50% 100%, 0% 85%, 0% 15%)' }}
+                    >
+                      <span className="font-cinzel text-xl text-[#D4AF37] font-medium">{item.val.toString().padStart(2, '0')}</span>
+                      <span className="font-oswald text-[7px] tracking-widest text-white/40 mt-1 font-light">{item.label}</span>
+                    </div>
                   ))}
                 </div>
+
+                {/* Add to Calendar Button */}
+                <div className="mt-10 flex justify-center">
+                  <a
+                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Ulug%27bek+%26+Kamola+Visol+To%27yi&dates=20260425T020000Z/20260425T170000Z&details=Sizni+farzandlarimiz+nikoh+to%27yi+tantanasida+kutamiz.&location=Bohodirjon+To%27yxonasi,+Piskent"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-oswald flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/20 text-[9px] tracking-[0.3em] uppercase text-white/80 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all"
+                  >
+                    <Calendar size={11} />
+                    <span>Kalendarga qo'shish</span>
+                  </a>
+                </div>
               </motion.div>
             </section>
-            <div style={{ height: 4, background: `linear-gradient(90deg, ${EMERALD}, ${RUBY}, ${GOLD}, ${RUBY}, ${EMERALD})` }} />
 
-            {/* === CLOSE === */}
-            <section className="py-32 px-6 text-center relative overflow-hidden" style={{ background: NAVY }}>
-              <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
-                {Array.from({ length: 8 }, (_, row) => (
-                  <div key={row} className="flex" style={{ marginLeft: row % 2 ? -24 : 0 }}>
-                    {Array.from({ length: 11 }, (_, col) => (
-                      <svg key={col} width="46" height="46" viewBox="0 0 46 46" fill="none" style={{ flexShrink: 0 }}>
-                        <polygon points="23,1 45,23 23,45 1,23" fill="none" stroke={GOLD} strokeWidth="0.8" />
-                        <polygon points="23,14 32,23 23,32 14,23" fill={GOLD} fillOpacity="0.35" />
-                      </svg>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade} className="relative z-10">
-                <div className="flex justify-center gap-4 mb-8">
-                  <IkatDiamond size={20} color={RUBY} fill="rgba(160,24,48,0.25)" />
-                  <IkatDiamond size={32} color={GOLD} fill="rgba(212,175,55,0.2)" />
-                  <IkatDiamond size={20} color={EMERALD} fill="rgba(20,77,48,0.25)" />
+            {/* VALEDICTION FOOTNOTE */}
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
+            <section className="py-32 px-6 text-center relative" style={{ background: NAVY }}>
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={royalFade}>
+                <div className="flex justify-center gap-3 mb-6 opacity-50">
+                  <IkatDiamond size={16} color={EMERALD} fill="transparent" />
+                  <IkatDiamond size={24} color={GOLD} fill="transparent" />
+                  <IkatDiamond size={16} color={RUBY} fill="transparent" />
                 </div>
-                <p className="font-lora italic max-w-[260px] mx-auto mb-8" style={{ fontSize: 16, color: 'rgba(245,230,200,0.55)', lineHeight: 2 }}>
-                  "Bizning baxtimiz sizning tashrifingiz bilan to'kis bo'ladi."
+                <p className="font-lora text-base italic max-w-[260px] mx-auto text-white/60 leading-relaxed mb-6 font-light">
+                  "Tashrifingiz qalbimizga quvonch, xonadonimizga fayz bag'ishlaydi."
                 </p>
-                <h2 className="font-cinzel" style={{ fontSize: '3rem', color: GOLD, letterSpacing: '0.3em' }}>U & K</h2>
-                <div className="flex justify-center gap-4 mt-8">
-                  <IkatDiamond size={20} color={EMERALD} fill="rgba(20,77,48,0.25)" />
-                  <IkatDiamond size={32} color={GOLD} fill="rgba(212,175,55,0.2)" />
-                  <IkatDiamond size={20} color={RUBY} fill="rgba(160,24,48,0.25)" />
-                </div>
+                <h2 className="font-cinzel text-3xl tracking-[0.3em] text-[#D4AF37] font-light">U & K</h2>
               </motion.div>
             </section>
 
-            <footer className="py-8 text-center" style={{ background: '#080520', borderTop: `0.5px solid rgba(212,175,55,0.15)` }}>
-              <p className="font-oswald" style={{ fontSize: 8, letterSpacing: '0.6em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.45)', fontWeight: 200 }}>
-                Designed by <Link href="https://webleaders.uz" className="hover:opacity-80 transition-opacity">WebLeaders</Link>
+            {/* BRANDED LUXURY FOOTER */}
+            <footer className="py-8 text-center bg-[#070517]" style={{ borderTop: `0.5px solid rgba(212,175,55,0.15)` }}>
+              <p className="font-oswald text-[8px] tracking-[0.5em] uppercase text-white/30 font-light">
+                Designed by <Link href="https://webleaders.uz" className="text-[#D4AF37]/60 hover:text-[#D4AF37] transition-colors">WebLeaders</Link>
               </p>
             </footer>
+
           </motion.div>
         )}
       </div>
