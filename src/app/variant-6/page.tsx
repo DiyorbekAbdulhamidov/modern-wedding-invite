@@ -2,512 +2,434 @@
 
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
-import { Play, MapPin, Camera, GlassWater, Utensils, Sparkles, BookHeart, CalendarHeart, CheckCircle, Mail, Calendar, Volume2, VolumeX, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { MapPin, CheckCircle, Loader2, Sparkles, Compass, Eye } from 'lucide-react';
+import * as THREE from 'three';
 
-// ==========================================
-// 3D MATH PARTICLE ENGINE (THREE.JS VIBE)
-// ==========================================
-interface Particle {
-  x: number; y: number; z: number;
-  vx: number; vy: number; vz: number;
-  alpha: number; size: number;
-}
-
-const Quantum3DCanvas = ({ isTriggered }: { isTriggered: boolean }) => {
+// --- THREE.JS: GENERATIVE 3D FLOATING ORGANIC PETALS ---
+const ThreeOrganicPetals = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const particles = useRef<Particle[]>([]);
-  const animationFrameId = useRef<number>(0);
-  const speedRef = useRef<number>(1);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!canvasRef.current) return;
 
-    const resizeCanvas = () => {
-      canvas.width = canvas.parentElement?.clientWidth || 450;
-      canvas.height = window.innerHeight;
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 12;
 
-    // Init Universe Particles (Ambient)
-    particles.current = Array.from({ length: 120 }, () => ({
-      x: (Math.random() - 0.5) * canvas.width * 2,
-      y: (Math.random() - 0.5) * canvas.height * 2,
-      z: Math.random() * canvas.width,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      vz: -Math.random() * 0.5 - 0.2,
-      alpha: Math.random() * 0.5 + 0.3,
-      size: Math.random() * 1.5 + 0.5
-    }));
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvasRef.current,
+      alpha: true,
+      antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
+    // Refined Luxury Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    scene.add(ambientLight);
 
-      // Smoothly accelerate particles during explosion
-      if (isTriggered && speedRef.current < 25) {
-        speedRef.current += 0.8;
+    const pointLight1 = new THREE.PointLight(0xfff5ea, 1.5, 30);
+    pointLight1.position.set(5, 5, 5);
+    scene.add(pointLight1);
+
+    const pointLight2 = new THREE.PointLight(0xd4af37, 0.5, 20);
+    pointLight2.position.set(-5, -5, 2);
+    scene.add(pointLight2);
+
+    // Creating Organic Petal Meshes
+    const petalCount = 22;
+    const petals: Array<{
+      mesh: THREE.Mesh;
+      baseSpeed: number;
+      rotSpeed: THREE.Vector3;
+      oscFreq: number;
+      oscAmp: number;
+      phase: number;
+    }> = [];
+
+    // Luxury Matte Translucent Material
+    const petalMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xfffaf0,
+      roughness: 0.2,
+      metalness: 0.1,
+      transmission: 0.6, // Glass-like transparency
+      ior: 1.2,
+      side: THREE.DoubleSide,
+      flatShading: true
+    });
+
+    for (let i = 0; i < petalCount; i++) {
+      const geometry = new THREE.SphereGeometry(0.35, 7, 7);
+
+      const pos = geometry.attributes.position;
+      for (let j = 0; j < pos.count; j++) {
+        let x = pos.getX(j);
+        let y = pos.getY(j);
+        let z = pos.getZ(j);
+        pos.setZ(j, z + Math.sin(x * 2) * 0.15);
       }
+      geometry.computeVertexNormals();
 
-      particles.current.forEach((p) => {
-        p.z += p.vz * speedRef.current;
-        p.x += p.vx * (isTriggered ? speedRef.current * 0.5 : 1);
-        p.y += p.vy * (isTriggered ? speedRef.current * 0.5 : 1);
+      const mesh = new THREE.Mesh(geometry, petalMaterial);
 
-        // Reset particle loop
-        if (p.z <= 0) {
-          p.z = canvas.width;
-          p.x = (Math.random() - 0.5) * canvas.width * 2;
-          p.y = (Math.random() - 0.5) * canvas.height * 2;
-          if (isTriggered) p.alpha = 0; // Fade out exploded ones
-        }
+      const scaleX = 0.8 + Math.random() * 0.8;
+      const scaleY = 0.2 + Math.random() * 0.3;
+      const scaleZ = 1.5 + Math.random() * 1.5;
+      mesh.scale.set(scaleX, scaleY, scaleZ);
 
-        // 3D Perspective Projection Matrix
-        const k = canvas.width / p.z;
-        const px = p.x * k + cx;
-        const py = p.y * k + cy;
+      mesh.position.set(
+        (Math.random() - 0.5) * 16,
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 8
+      );
 
-        if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
-          const size = p.size * k * 0.8;
-          ctx.beginPath();
-          ctx.arc(px, py, Math.max(0.1, size), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(197, 160, 89, ${p.alpha * (k / 3)})`;
-          ctx.shadowBlur = isTriggered ? 15 : 5;
-          ctx.shadowColor = '#C5A059';
-          ctx.fill();
+      scene.add(mesh);
+
+      petals.push({
+        mesh,
+        baseSpeed: 0.008 + Math.random() * 0.012,
+        rotSpeed: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.015,
+          (Math.random() - 0.5) * 0.015,
+          (Math.random() - 0.5) * 0.015
+        ),
+        oscFreq: 0.5 + Math.random() * 1.5,
+        oscAmp: 0.005 + Math.random() * 0.01,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    let mouseX = 0;
+    let mouseY = 0;
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX = (e.clientX / window.innerWidth) - 0.5;
+      mouseY = (e.clientY / window.innerHeight) - 0.5;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    const clock = new THREE.Clock();
+    const animate = () => {
+      const elapsedTime = clock.getElapsedTime();
+
+      petals.forEach((p) => {
+        p.mesh.position.y -= p.baseSpeed;
+        p.mesh.position.x += Math.sin(elapsedTime * p.oscFreq + p.phase) * p.oscAmp;
+
+        p.mesh.position.x += (mouseX * 2 - p.mesh.position.x) * 0.01;
+        p.mesh.position.y += (-mouseY * 2 - p.mesh.position.y) * 0.01;
+
+        p.mesh.rotation.x += p.rotSpeed.x;
+        p.mesh.rotation.y += p.rotSpeed.y;
+        p.mesh.rotation.z += p.rotSpeed.z;
+
+        if (p.mesh.position.y < -8) {
+          p.mesh.position.y = 8;
+          p.mesh.position.x = (Math.random() - 0.5) * 16;
         }
       });
 
-      animationFrameId.current = requestAnimationFrame(render);
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
     };
+    animate();
 
-    render();
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      cancelAnimationFrame(animationFrameId.current);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
+      renderer.dispose();
     };
-  }, [isTriggered]);
+  }, []);
 
-  // Massive explosion injection when clicked
-  useEffect(() => {
-    if (isTriggered) {
-      for (let i = 0; i < 250; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 8 + 4;
-        particles.current.push({
-          x: (Math.random() - 0.5) * 20,
-          y: (Math.random() - 0.5) * 20,
-          z: (canvasRef.current?.width || 450) * 0.8,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          vz: -Math.random() * 5 - 2,
-          alpha: 1,
-          size: Math.random() * 2.5 + 1
-        });
-      }
-    }
-  }, [isTriggered]);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-[90]" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-10" />;
 };
 
-// --- AUDIO WAVE INTERACTIVE VISUALIZER ---
-const AudioWaveform = ({ isPlaying }: { isPlaying: boolean }) => (
-  <div className="flex items-end gap-[3px] h-4 w-6 justify-center">
-    {[0.7, 1.2, 0.4, 0.9, 0.6, 1.0].map((speed, i) => (
-      <motion.div
-        key={i}
-        className="w-[2px] bg-[#C5A059] rounded-full"
-        initial={{ height: "3px" }}
-        animate={isPlaying ? { height: ["3px", "18px", "3px"] } : { height: "3px" }}
-        transition={{ duration: speed, repeat: Infinity, ease: "easeInOut", delay: i * 0.08 }}
-      />
-    ))}
-  </div>
-);
+// --- MAIN TEMPLATE COMPONENT ---
+const LiquidLiquidWedding: NextPage = () => {
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [rsvpStatus, setRsvpStatus] = useState<null | 'yes' | 'no'>(null);
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
 
-const UltraLuxuryWedding: NextPage = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isStarted, setIsStarted] = useState(false);
-  const [isExploding, setIsExploding] = useState(false);
-  const [rsvpStatus, setRsvpStatus] = useState<null | 'attending' | 'declined'>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef });
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
+  const textY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const imageY = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
-  const timelineLineY = useTransform(scrollYProgress, [0.18, 0.5], ["0%", "100%"]);
+  const triggerRSVP = async (choice: 'yes' | 'no') => {
+    if (!name.trim()) return alert("Iltimos, ismingizni kiriting.");
+    setLoading(true);
 
-  // 3D Card Hover / Tilt Effects Matrix
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 120, damping: 20 });
-  const springY = useSpring(mouseY, { stiffness: 120, damping: 20 });
+    const botToken = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
 
-  const rotateX = useTransform(springY, [-200, 200], [12, -12]);
-  const rotateY = useTransform(springX, [-200, 200], [-12, 12]);
-  const glareX = useTransform(springX, [-200, 200], ["0%", "100%"]);
-  const glareY = useTransform(springY, [-200, 200], ["0%", "100%"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const x = e.clientX - rect.left - width / 2;
-    const y = e.clientY - rect.top - height / 2;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-
-  const handleStart = () => {
-    setIsExploding(true); // Fire 3D explosion first
-    if (audioRef.current) {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => console.log("Blocked."));
-    }
-    setTimeout(() => {
-      setIsStarted(true);
-    }, 1200); // Wait for the matrix burst to blind the view beautifully
-  };
-
-  const toggleMusic = () => {
-    if (audioRef.current) {
-      if (isPlaying) audioRef.current.pause();
-      else audioRef.current.play();
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  const downloadCalendarEvent = () => {
-    const iCalendarData = [
-      'BEGIN:VCALENDAR', 'VERSION:2.0', 'BEGIN:VEVENT',
-      'DESCRIPTION:Sardor & Amira Visol Oqshomi',
-      'DTSTART:20260515T130000Z', 'DTEND:20260515T180000Z',
-      'LOCATION:Versal Saroyi, Toshkent', 'SUMMARY:Sardor & Amira Nikoh Tantanasi',
-      'END:VEVENT', 'END:VCALENDAR'
-    ].join('\r\n');
-    const blob = new Blob([iCalendarData], { type: 'text/calendar;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.setAttribute('download', 'sardor-amira.ics');
-    link.click();
-  };
-
-  const [timeLeft, setTimeLeft] = useState({ kun: 0, soat: 0, daqiqa: 0, soniya: 0 });
-  const targetDate = new Date('2026-05-15T18:00:00').getTime();
-
-  useEffect(() => {
-    if (!isStarted) return;
-    const timer = setInterval(() => {
-      const distance = targetDate - new Date().getTime();
-      if (distance > 0) {
-        setTimeLeft({
-          kun: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          soat: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          daqiqa: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          soniya: Math.floor((distance % (1000 * 60)) / 1000),
+    if (botToken && chatId) {
+      try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: `🪐 *Liquid Avant-Garde RSVP*\n\n👤 *Mehmon:* ${name}\n*Qaror:* ${choice === 'yes' ? '👑 Keladi' : '🕊️ Afsuski yoq'}`,
+            parse_mode: 'Markdown'
+          })
         });
+      } catch (err) {
+        console.error(err);
       }
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [isStarted]);
+    }
+    setRsvpStatus(choice);
+    setLoading(false);
+  };
 
   return (
-    <div ref={containerRef} className="bg-[#050505] min-h-screen flex justify-center selection:bg-[#C5A059] selection:text-white font-sans overflow-hidden antialiased">
-      <div className="w-full max-w-[450px] bg-[#FFFFFF] text-[#111111] relative overflow-x-hidden shadow-[0_0_120px_rgba(0,0,0,0.4)]">
+    <div ref={containerRef} className="bg-[#FAF9F6] min-h-[100svh] text-[#0A0A0A] flex justify-center overflow-hidden font-syncopate antialiased selection:bg-[#E5D3B3]">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Syne:wght@400;500;700&family=Cinzel+Decorative:wght@400;700&display=swap');
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-syne { font-family: 'Syne', sans-serif; }
+        .font-decorative { font-family: 'Cinzel Decorative', serif; }
+        
+        .outline-text {
+          -webkit-text-stroke: 1px #0A0A0A;
+          color: transparent;
+        }
+      `}</style>
 
+      <div className="w-full max-w-[460px] relative bg-[#FCFBF9] shadow-[0_0_100px_rgba(0,0,0,0.02)] border-x border-[#ECEAE4]">
         <Head>
-          <title>Sardor & Amira | The Royal 3D Masterpiece</title>
-          <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Alex+Brush&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+          <title>The Monolith Tapes | S & A</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         </Head>
 
-        <audio ref={audioRef} loop preload="auto">
-          <source src="/die.mp3" type="audio/mpeg" />
-        </audio>
+        {isUnlocked && <ThreeOrganicPetals />}
 
-        {/* --- 3D PARTICLE BURST SPLASH SCREEN --- */}
+        {/* --- ANTI-CONVENTIONAL UNLOCK LAYER --- */}
         <AnimatePresence>
-          {!isStarted && (
-            <div className="fixed inset-0 z-[200] flex justify-center items-center overflow-hidden max-w-[450px] mx-auto bg-[#0A0A0A]">
-              <Quantum3DCanvas isTriggered={isExploding} />
+          {!isUnlocked && (
+            <motion.div
+              className="fixed inset-0 z-[300] flex flex-col items-stretch justify-between bg-[#0A0A0A] p-8 text-[#FAF9F6]"
+              exit={{ y: "-100%", transition: { duration: 1.4, ease: [0.85, 0, 0.15, 1] } }}
+            >
+              <div className="flex justify-between items-center text-[8px] tracking-[0.6em] text-[#666] uppercase">
+                <span>Abstract Core</span>
+                <span>Vol. VI</span>
+              </div>
 
-              {/* Gate Left */}
-              <motion.div
-                className="absolute left-0 top-0 bottom-0 w-1/2 bg-[#0A0A0A] border-r-[0.5px] border-[#C5A059]/20 z-10 shadow-[20px_0_50px_rgba(0,0,0,0.8)]"
-                exit={{ x: "-100%" }} transition={{ duration: 1.4, ease: [0.85, 0, 0.15, 1] }}
-              />
-              {/* Gate Right */}
-              <motion.div
-                className="absolute right-0 top-0 bottom-0 w-1/2 bg-[#0A0A0A] border-l-[0.5px] border-[#C5A059]/20 z-10 shadow-[-20px_0_50px_rgba(0,0,0,0.8)]"
-                exit={{ x: "100%" }} transition={{ duration: 1.4, ease: [0.85, 0, 0.15, 1] }}
-              />
+              <div className="space-y-4 my-auto">
+                <h1 className="font-decorative text-4xl font-bold tracking-widest text-center leading-relaxed">
+                  S <span className="font-playfair italic font-light text-xl text-[#C5A880]">and</span> A
+                </h1>
+                <div className="h-[1px] w-full bg-[#222]" />
+                <p className="font-syne text-[10px] tracking-[0.4em] text-center text-[#999] uppercase">
+                  An Experience Beyond Traditions
+                </p>
+              </div>
 
-              {/* Core Enter Trigger UI */}
-              <motion.div
-                className="absolute z-20 flex flex-col items-center justify-center text-center px-6"
-                exit={{ opacity: 0, scale: 0.7, filter: "blur(15px)" }} transition={{ duration: 0.6 }}
+              <motion.button
+                onClick={() => setIsUnlocked(true)}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-6 bg-[#FAF9F6] text-[#0A0A0A] font-syne text-[11px] tracking-[0.5em] uppercase font-bold flex items-center justify-center gap-3 transition-all"
               >
-                <motion.div
-                  animate={{ y: [0, -6, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="font-['Playfair_Display'] text-[5.5rem] text-[#C5A059] font-extralight tracking-widest leading-none opacity-90 mb-4 selection:bg-transparent"
-                >
-                  S & A
-                </motion.div>
-                <p className="font-['Montserrat'] text-[8px] tracking-[0.6em] text-gray-400 uppercase mb-24 font-light">EXCLUSIVE KINETIC INVITATION</p>
-
-                <button
-                  onClick={handleStart}
-                  className="w-24 h-24 rounded-full bg-gradient-to-b from-white/[0.06] to-transparent border border-[#C5A059]/40 flex flex-col items-center justify-center text-[#C5A059] relative group backdrop-blur-md active:scale-95 transition-all duration-300"
-                >
-                  <motion.div className="absolute inset-0 rounded-full border border-[#C5A059]/20" animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} />
-                  <Play className="w-5 h-5 ml-1 text-[#C5A059] fill-current" />
-                </button>
-              </motion.div>
-            </div>
+                <Compass size={14} className="animate-spin" /> VERSIYANI OCHISH
+              </motion.button>
+            </motion.div>
           )}
         </AnimatePresence>
 
-        {/* --- MAIN HIGH-END SITE ARCHITECTURE --- */}
-        {isStarted && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="relative z-10 bg-[#FFFFFF]">
+        {/* --- MAIN ASYMMETRICAL EDITORIAL CORE --- */}
+        {isUnlocked && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="relative z-20">
 
-            {/* AMBIENT LIVING UNIVERSE CANVAS BACKGROUND */}
-            <Quantum3DCanvas isTriggered={false} />
+            {/* HERO SECTION: THE MONOLITH TYPOGRAPHY */}
+            <section className="min-h-[100svh] px-6 py-12 flex flex-col justify-between relative">
+              <div className="w-full flex justify-between items-start">
+                <span className="font-syne text-[9px] tracking-[0.5em] uppercase text-[#C5A880]">June 2026</span>
+                <span className="font-playfair italic text-sm text-[#0A0A0A]">№ 06</span>
+              </div>
 
-            {/* FLOATING GLASS PLAYER CONTROLLER */}
-            <motion.button
-              onClick={toggleMusic}
-              className="fixed bottom-6 right-6 z-[150] px-4 h-12 bg-white/70 backdrop-blur-xl rounded-full flex items-center gap-3 shadow-[0_20px_40px_rgba(197,160,89,0.15)] border border-[#C5A059]/20 active:scale-95 transition-all"
-            >
-              <AudioWaveform isPlaying={isPlaying} />
-              <div className="w-[1px] h-3 bg-gray-200" />
-              {isPlaying ? <Volume2 className="text-[#C5A059] w-4 h-4 animate-pulse" /> : <VolumeX className="text-gray-400 w-4 h-4" />}
-            </motion.button>
+              <motion.div style={{ y: textY }} className="w-full my-auto text-left space-y-0 relative">
+                <h1 className="font-syne text-7xl font-bold tracking-tighter leading-[0.8] text-[#0A0A0A] uppercase">
+                  SARDOR
+                </h1>
+                <div className="py-2 pl-4 flex items-center gap-4">
+                  <div className="h-[1px] flex-1 bg-[#0A0A0A]/10" />
+                  <span className="font-playfair italic text-4xl text-[#C5A880]">amira</span>
+                </div>
+                <h1 className="font-syne text-7xl font-bold tracking-tighter leading-[0.8] uppercase outline-text">
+                  MARRIAGE
+                </h1>
+              </motion.div>
 
-            {/* =========================================
-                1. HERO SECTION (3D Gyro Hologram)
-            ========================================= */}
-            <section className="relative min-h-screen w-full flex flex-col items-center justify-center pt-16 pb-20 overflow-hidden">
-              <span className="font-['Montserrat'] tracking-[0.7em] text-[8px] text-[#C5A059] font-bold uppercase mb-12 block">
-                THE WEDDING CELEBRATION
-              </span>
+              <div className="grid grid-cols-2 items-end gap-4 pt-4 border-t border-[#0A0A0A]/5">
+                <div>
+                  <p className="font-syne text-[8px] tracking-[0.3em] uppercase text-[#777]">Konseptual Studio</p>
+                  <p className="font-playfair italic text-xs text-[#0A0A0A] mt-1">Versal Tapes, Tashkent</p>
+                </div>
+                <div className="text-right">
+                  <span className="font-syne text-2xl font-medium tracking-tight text-[#0A0A0A]">20.06</span>
+                </div>
+              </div>
+            </section>
 
-              {/* Advanced 3D Interactive Frame Matrix */}
-              <div
-                className="relative w-[80%] aspect-[3/4] mb-12 perspective-[1000px] cursor-grab active:cursor-grabbing"
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-              >
-                <motion.div
-                  style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                  className="w-full h-full rounded-t-[15rem] rounded-b-[2rem] border-[0.5px] border-[#C5A059]/60 p-2 shadow-[0_35px_80px_rgba(0,0,0,0.08)] bg-white relative group transition-all"
-                >
-                  <div className="w-full h-full rounded-t-[14.5rem] rounded-b-[1.6rem] overflow-hidden relative" style={{ transform: "translateZ(30px)" }}>
-                    <img src="/dreamwedding.jpg" alt="Masterpiece Frame" className="w-full h-full object-cover object-top scale-105 group-hover:scale-100 transition-transform duration-[2s]" />
-                    {/* Advanced Glare Reflection Layer */}
-                    <motion.div
-                      style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.4) ${glareX}, transparent ${glareY})` }}
-                      className="absolute inset-0 pointer-events-none mix-blend-overlay"
+            {/* MANIFESTO / STATEMENT BLOCK */}
+            <section className="py-32 px-6 bg-[#0A0A0A] text-[#FAF9F6] relative z-20">
+              <div className="max-w-[340px] mx-auto space-y-12">
+                <div className="flex items-center gap-3">
+                  <Sparkles size={12} className="text-[#C5A880]" />
+                  <span className="font-syne text-[8px] tracking-[0.5em] uppercase text-[#666]">Manifesto</span>
+                </div>
+
+                <p className="font-playfair text-2xl font-light leading-relaxed italic text-zinc-300">
+                  "Biz an'analarni buzmagan holda, yangi koinot yaratmoqchimiz. Ikki hayotning bir butunlik kasb etish lahzasi."
+                </p>
+
+                <div className="space-y-4 font-syne text-xs font-light text-zinc-400 leading-loose">
+                  <p>Hurmatli qadrdonimiz, hayotimizning eng radikal va eng chiroyli qarorini nishonlash arafasidatiz. Ushbu installyatsiyada sizning borligingiz biz uchun san'at asaridek qadrli.</p>
+                </div>
+              </div>
+            </section>
+
+            {/* GALLERY: MULTI-LAYER ASYMMETRICAL GRIDS */}
+            <section className="py-32 px-6 relative">
+              <div className="max-w-[380px] mx-auto space-y-24">
+
+                <div className="relative">
+                  <motion.div style={{ y: imageY }} className="w-2/3 bg-zinc-200 aspect-[3/4] overflow-hidden border border-[#ECEAE4] p-2 bg-white shadow-xl">
+                    <img
+                      src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=600&auto=format&fit=crop"
+                      alt="Editorial Frame"
+                      className="w-full h-full object-cover grayscale contrast-125 hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent opacity-90" />
+                  </motion.div>
+                  <div className="absolute right-0 bottom-4 w-1/2 font-syne space-y-2 text-right bg-white/60 backdrop-blur-md p-4 border border-[#ECEAE4]/40">
+                    <span className="text-[8px] tracking-[0.3em] text-[#C5A880] uppercase block">Frame 01 //</span>
+                    <h4 className="text-xs font-bold uppercase tracking-tight">ELEGANT CHAOS</h4>
                   </div>
-                </motion.div>
+                </div>
+
+                <div className="flex justify-end relative">
+                  <motion.div className="w-3/4 bg-zinc-200 aspect-square overflow-hidden border border-[#ECEAE4] p-2 bg-white shadow-lg">
+                    <img
+                      src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=600&auto=format&fit=crop"
+                      alt="Editorial Frame 2"
+                      className="w-full h-full object-cover grayscale brightness-95"
+                    />
+                  </motion.div>
+                </div>
+
               </div>
+            </section>
 
-              {/* High-End Overlapping Typography */}
-              <div className="relative z-30 flex flex-col items-center w-full px-4 text-center">
-                <h1 className="font-['Playfair_Display'] text-[5rem] font-light text-[#111] leading-none tracking-tight">Sardor</h1>
-                <div className="font-['Alex_Brush'] text-[3.8rem] text-[#C5A059] my-[-15px] italic select-none rotate-[-6deg]">and</div>
-                <h1 className="font-['Playfair_Display'] text-[5rem] font-light text-[#111] leading-none tracking-tight ml-12">Amira</h1>
+            {/* CHRONOLOGY: TIMELINE LABS */}
+            <section className="py-32 px-6 bg-[#F6F5F0] border-y border-[#ECEAE4]">
+              <div className="max-w-[340px] mx-auto space-y-12">
+                <div className="text-left">
+                  <span className="font-syne text-[8px] tracking-[0.6em] uppercase text-[#C5A880] block mb-2">Chronology</span>
+                  <h3 className="font-syne text-3xl font-bold uppercase tracking-tighter">TIME SCHEDULE</h3>
+                </div>
 
-                <div className="flex items-center justify-center gap-4 mt-16 w-full max-w-[260px]">
-                  <div className="h-[0.5px] flex-1 bg-gradient-to-r from-transparent to-[#C5A059]" />
-                  <p className="font-['Montserrat'] tracking-[0.4em] text-[10px] text-[#111] font-bold">15 . 05 . 2026</p>
-                  <div className="h-[0.5px] flex-1 bg-gradient-to-l from-transparent to-[#C5A059]" />
+                <div className="space-y-4">
+                  {[
+                    { hr: "14", min: "00", event: "REGISTRATION LAB", detail: "FHDYo tantanali marosim qismi" },
+                    { hr: "17", min: "00", event: "AMBIENT HOURS / WELCOME", detail: "Klassik fureshet va mehmonlar oqimi" },
+                    { hr: "18", min: "30", event: "MAIN AUDIO-VISUAL BANQUET", detail: "Asosiy kecha, badiiy qism va installyatsiya" }
+                  ].map((item, idx) => (
+                    <div key={idx} className="p-6 bg-white border border-[#ECEAE4] flex items-center justify-between gap-4">
+                      <div className="flex items-baseline font-syne text-2xl font-bold text-[#C5A880]">
+                        <span>{item.hr}</span>
+                        <span className="text-xs text-[#0A0A0A]/30 mx-0.5">:</span>
+                        <span className="text-sm font-medium text-[#0A0A0A]">{item.min}</span>
+                      </div>
+                      <div className="text-right font-syne space-y-1">
+                        <h4 className="text-xs font-bold uppercase tracking-tight">{item.event}</h4>
+                        <p className="text-[10px] text-[#777] font-light">{item.detail}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </section>
 
-            {/* =========================================
-                2. ASYMMETRIC TIMELINE (Cinematic Stream)
-            ========================================= */}
-            <section className="py-28 px-6 relative z-10 bg-[#FAF9F5]">
-              <div className="text-left max-w-[340px] mx-auto mb-20">
-                <CalendarHeart className="w-6 h-6 text-[#C5A059] mb-4 opacity-80" />
-                <h2 className="font-['Playfair_Display'] text-3xl font-light text-[#111] tracking-wide">Taqdir Yo'llari</h2>
-                <p className="font-['Montserrat'] text-[8px] tracking-[0.25em] text-gray-400 uppercase mt-1">THE SACRED CHRONICLES</p>
-              </div>
-
-              <div className="relative max-w-[340px] mx-auto pl-6">
-                {/* Micro-engineered timeline rail */}
-                <div className="absolute left-[3px] top-2 bottom-2 w-[0.5px] bg-gray-200" />
-                <motion.div
-                  style={{ height: timelineLineY }}
-                  className="absolute left-[3px] top-2 w-[1px] bg-[#C5A059] origin-top shadow-[0_0_10px_#C5A059]"
-                />
-
-                {[
-                  { date: "Oktabr, 2024", title: "Ruhlar To'qnashuvi", desc: "Ikki uzoq qalbning bir lahzalik tasodifiy nigohda mangu bog'lanishi." },
-                  { date: "Noyabr, 2025", title: "Oq Fotiha Va Rizo", desc: "Oila muqaddasligi yo'lida kattalarning oq duosi va go'zal ahdlashuv." },
-                  { date: "May, 2026", title: "Visol Va Abadiyat", desc: "Alloh guvohligida ikki daryoning bitta ummonga aylanish oqshomi." }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 35 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-120px" }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: index * 0.15 }}
-                    className="relative mb-16 last:mb-0 block"
-                  >
-                    <div className="absolute left-[-26px] top-1.5 w-2 h-2 rounded-full bg-white border-2 border-[#C5A059] z-20 shadow-sm" />
-                    <span className="font-['Montserrat'] text-[8.5px] tracking-[0.2em] text-[#C5A059] font-bold block mb-1 uppercase">{item.date}</span>
-                    <h4 className="font-['Playfair_Display'] text-[17px] text-[#111] font-medium mb-2">{item.title}</h4>
-                    <p className="font-['Playfair_Display'] text-[13.5px] text-gray-500 italic leading-[1.8]">{item.desc}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
-
-            {/* =========================================
-                3. VOGUE EDITION EHTIROM MAKTUBI
-            ========================================= */}
-            <section className="py-28 px-6 bg-[#FFFFFF] relative z-10">
-              <div className="relative max-w-[360px] mx-auto">
-                {/* Layered Floating Card Design */}
-                <div className="absolute inset-0 bg-[#FAF9F5] rounded-[2.5rem] transform translate-y-4 translate-x-2 -rotate-1 pointer-events-none" />
-
-                <div className="bg-white p-12 border border-gray-100/80 shadow-[0_30px_70px_rgba(0,0,0,0.03)] rounded-[2.5rem] relative overflow-hidden text-center z-10">
-                  <BookHeart className="w-6 h-6 text-[#C5A059] mx-auto mb-6 opacity-70" />
-
-                  <p className="font-['Montserrat'] text-[8.5px] tracking-[0.4em] text-[#C5A059] uppercase font-bold mb-10">TASHRIFINGIZ — KO'RKIMIZ</p>
-
-                  <div className="font-['Playfair_Display'] text-[15px] text-gray-700 leading-[2.5] italic space-y-6">
-                    <p>"Yaratgan ato etgan eng go'zal ne'mat farzand kamolini ko'rmoqdir.</p>
-                    <div className="my-8 py-3 border-y border-gray-100/80 not-italic">
-                      <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-gray-400 font-bold block mb-1">Kalin & Kuyov:</span>
-                      <h3 className="font-['Playfair_Display'] text-[1.3rem] tracking-wide font-medium text-black">Sardorjon & Amiraxon</h3>
-                    </div>
-                    <p>Ushbu baxt oqshomida siz kabi aziz, qalbi daryo insonlarning samimiy duolari davramizga fayz bag'ishlaydi. Lutfan taklif etamiz."</p>
-                  </div>
-
-                  <div className="mt-12 pt-8 border-t border-gray-100">
-                    <span className="font-['Montserrat'] text-[8px] uppercase tracking-widest text-gray-400 block mb-2">Xonadon Egalari:</span>
-                    <p className="font-['Playfair_Display'] text-[16px] text-[#111] font-semibold">Ikromovlar va Aliyevlar oilasi</p>
-                  </div>
+            {/* LOCATION MAP MODULE */}
+            <section className="py-32 px-6 bg-white text-center">
+              <div className="max-w-[320px] mx-auto space-y-8">
+                <div className="w-12 h-12 rounded-full border border-[#0A0A0A] flex items-center justify-center mx-auto animate-spin">
+                  <Eye size={16} strokeWidth={1.5} />
                 </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-syne text-xl font-bold uppercase tracking-tighter">VERSAL HALL</h4>
+                  <p className="font-playfair italic text-sm text-[#555]">Yunusobod tumani, Amir Temur prospekti, Toshkent</p>
+                </div>
+
+                <Link
+                  href="https://maps.google.com"
+                  target="_blank"
+                  className="font-syne text-[10px] tracking-[0.4em] uppercase border border-[#0A0A0A] px-10 py-4 inline-block hover:bg-[#0A0A0A] hover:text-white transition-all duration-300"
+                >
+                  NAVIGATSIYANI OCHISH
+                </Link>
               </div>
             </section>
 
-            {/* =========================================
-                4. THE ROYAL PROGRAM (Asymmetric Luxury Card)
-            ========================================= */}
-            <section className="py-28 px-6 bg-[#FAF9F5] relative z-10">
-              <div className="text-center mb-20">
-                <h2 className="font-['Playfair_Display'] text-3xl font-light tracking-wide text-[#111]">Tantana Nizomi</h2>
-                <p className="font-['Montserrat'] text-[8px] tracking-[0.3em] text-gray-400 uppercase mt-2">CHRONOLOGICAL DYNAMICS</p>
-              </div>
+            {/* RSVP CONTROL CENTER */}
+            <section className="py-32 px-6 bg-[#0A0A0A] text-[#FAF9F6] border-t border-zinc-800">
+              <div className="max-w-[340px] mx-auto text-center space-y-10">
+                <div className="space-y-2">
+                  <span className="font-syne text-[8px] tracking-[0.6em] uppercase text-[#C5A880] block">System RSVP</span>
+                  <h3 className="font-syne text-2xl font-bold uppercase tracking-tight">TASHRIF MATRIXI</h3>
+                </div>
 
-              <div className="space-y-6 max-w-[340px] mx-auto">
-                {[
-                  { icon: Camera, time: "14:00", title: "Kino & Foto Marosim", desc: "Xotiralarga muhrlanadigan go'zal on" },
-                  { icon: GlassWater, time: "17:30", title: "Symphony Welcome", desc: "Jonli klassik orkestr ostida qabul" },
-                  { icon: Utensils, time: "18:00", title: "Shohona Asosiy Bazm", desc: "Dabdabali \"Versal\" saroyi yorqin oqshomi", dynamic: true }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.01, y: -2 }}
-                    className={`p-6 rounded-2xl border transition-all duration-400 ${item.dynamic ? 'bg-[#111] text-white border-[#C5A059] shadow-[0_20px_40px_rgba(0,0,0,0.15)]' : 'bg-white border-gray-100 shadow-sm'}`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${item.dynamic ? 'bg-[#C5A059]/10 border-[#C5A059]/40 text-[#C5A059]' : 'bg-[#FAF9F5] border-gray-100 text-gray-700'}`}>
-                        <item.icon className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`font-['Playfair_Display'] text-[18px] font-semibold ${item.dynamic ? 'text-[#C5A059]' : 'text-[#111]'}`}>{item.time}</span>
-                          <span className={`w-1 h-1 rounded-full ${item.dynamic ? 'bg-[#C5A059]' : 'bg-gray-300'}`} />
-                          <h4 className="font-['Montserrat'] text-[10px] font-bold tracking-wider uppercase">{item.title}</h4>
-                        </div>
-                        <p className={`font-['Playfair_Display'] text-[13px] italic ${item.dynamic ? 'text-gray-400' : 'text-gray-500'}`}>{item.desc}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
-
-            {/* =========================================
-                5. UX LOCATION & SMART CALENDAR ENGINE
-            ========================================= */}
-            <section className="py-24 px-6 bg-[#FFFFFF] space-y-8 max-w-[350px] mx-auto">
-              {/* Maps Grid */}
-              <div className="p-8 rounded-[2rem] border border-gray-100 text-center shadow-[0_15px_40px_rgba(0,0,0,0.02)] bg-white">
-                <MapPin className="w-5 h-5 text-[#C5A059] mx-auto mb-4" />
-                <h3 className="font-['Playfair_Display'] text-[19px] font-medium text-[#111] mb-2">Manzil Geolokatsiyasi</h3>
-                <p className="font-['Montserrat'] text-[11px] text-gray-500 leading-relaxed mb-6">
-                  Toshkent sh., Yunusobod tumani, Teleminora ro'parasidan o'ngga burilish.
-                </p>
-                <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="w-full py-4 bg-[#111] text-white font-['Montserrat'] text-[9px] tracking-[0.25em] font-bold uppercase rounded-xl hover:bg-[#C5A059] transition-all flex items-center justify-center gap-2 shadow-sm">
-                  Xaritada Ko'rish <ArrowRight className="w-3 h-3" />
-                </a>
-              </div>
-
-              {/* Advanced Calendar Syncer UX */}
-              <div className="p-8 rounded-[2rem] border border-gray-100 text-center shadow-[0_15px_40px_rgba(0,0,0,0.02)] bg-[#FAF9F5]">
-                <Calendar className="w-5 h-5 text-[#C5A059] mx-auto mb-4" />
-                <h3 className="font-['Playfair_Display'] text-[19px] font-medium text-[#111] mb-2">Smart Sinxronizatsiya</h3>
-                <p className="font-['Montserrat'] text-[11px] text-gray-500 leading-relaxed mb-6">
-                  Ushbu muqaddas sanani unutilmasligi uchun bitta klik orqali shaxsiy taqvimingizga saqlab qo'ying.
-                </p>
-                <button onClick={downloadCalendarEvent} className="w-full py-4 bg-white border border-gray-200 text-gray-800 font-['Montserrat'] text-[9px] tracking-[0.25em] font-bold uppercase rounded-xl hover:border-[#C5A059] hover:text-[#C5A059] transition-all flex items-center justify-center gap-2">
-                  Taqvimga kiritish (ICS)
-                </button>
-              </div>
-            </section>
-
-            {/* =========================================
-                6. HIGH-END RSVP SYSTEM (Digital Ticket)
-            ========================================= */}
-            <section className="py-28 px-6 bg-[#0B0B0B] text-white relative overflow-hidden">
-              <div className="relative z-10 max-w-[340px] mx-auto text-center">
-                <Mail className="w-5 h-5 text-[#C5A059] mx-auto mb-4" />
-                <h3 className="font-['Playfair_Display'] text-2xl mb-2 tracking-wide font-light">Tashrif Tasdig'i</h3>
-                <p className="font-['Montserrat'] text-[8px] text-gray-400 tracking-[0.3em] uppercase mb-12">ONLAYN RSVP DEPARTAMENTI</p>
-
-                <div className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-8 backdrop-blur-md shadow-2xl">
+                <div className="bg-[#111111] p-6 border border-zinc-800 text-left space-y-6">
                   <AnimatePresence mode="wait">
                     {!rsvpStatus ? (
-                      <motion.div key="form-container" exit={{ opacity: 0, scale: 0.95 }} className="space-y-4">
-                        <button onClick={() => setRsvpStatus('attending')} className="w-full py-4 bg-[#C5A059] text-white font-['Montserrat'] text-[10px] font-bold tracking-[0.2em] uppercase rounded-xl hover:bg-[#b08f51] transition-all shadow-lg">
-                          Lutfan boraman
-                        </button>
-                        <button onClick={() => setRsvpStatus('declined')} className="w-full py-4 bg-transparent border border-white/10 text-gray-400 font-['Montserrat'] text-[10px] tracking-[0.2em] uppercase rounded-xl hover:text-white hover:border-white/30 transition-all">
-                          Uzr, bora olmayman
-                        </button>
+                      <motion.div key="rsvp-form" exit={{ opacity: 0 }} className="space-y-6">
+                        <div className="space-y-2">
+                          <label className="font-syne text-[8px] tracking-widest text-zinc-500 uppercase block">Mehmon Identifikatsiyasi</label>
+                          <input
+                            type="text"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            placeholder="ISM / FAMILIYA"
+                            className="w-full bg-transparent font-syne text-sm py-3 border-b border-zinc-800 text-white focus:border-[#C5A880] focus:outline-none transition-colors placeholder:text-zinc-700 uppercase"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-4">
+                          <button
+                            onClick={() => triggerRSVP('yes')}
+                            disabled={loading}
+                            className="py-4 bg-[#FAF9F6] text-[#0A0A0A] font-syne text-[9px] tracking-widest uppercase font-bold disabled:opacity-40 active:scale-95 transition-transform flex items-center justify-center"
+                          >
+                            {loading ? <Loader2 size={12} className="animate-spin" /> : "KELAMAN"}
+                          </button>
+                          <button
+                            onClick={() => triggerRSVP('no')}
+                            disabled={loading}
+                            className="py-4 border border-zinc-800 bg-transparent text-zinc-400 font-syne text-[9px] tracking-widest uppercase font-light disabled:opacity-40 active:scale-95 transition-transform flex items-center justify-center"
+                          >
+                            {loading ? <Loader2 size={12} className="animate-spin" /> : "ISHTIROK ETMASLIK"}
+                          </button>
+                        </div>
                       </motion.div>
                     ) : (
-                      <motion.div key="success-container" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="py-6">
-                        <div className="w-12 h-12 rounded-full border border-[#C5A059]/40 bg-[#C5A059]/10 flex items-center justify-center mx-auto mb-4">
-                          <CheckCircle className="w-5 h-5 text-[#C5A059]" />
-                        </div>
-                        <p className="font-['Playfair_Display'] text-[19px] italic text-white mb-1">Munosabatingiz Saqlandi!</p>
-                        <p className="font-['Montserrat'] text-[8px] text-gray-500 tracking-widest uppercase">Webleaders Smart System</p>
+                      <motion.div key="rsvp-success" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-6 space-y-4">
+                        <CheckCircle size={32} className="text-[#C5A880] mx-auto stroke-1" />
+                        <h4 className="font-syne text-sm font-bold uppercase tracking-wider">XABAR YUBORILDI</h4>
+                        <p className="font-playfair italic text-xs text-zinc-400">
+                          {rsvpStatus === 'yes' ? "Siz bilan birga mukammallikka erishamiz." : "Tilaklaringiz tizimda saqlanib qoldi."}
+                        </p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -515,34 +437,19 @@ const UltraLuxuryWedding: NextPage = () => {
               </div>
             </section>
 
-            {/* =========================================
-                7. THE QUANTUM TIMER
-            ========================================= */}
-            <section className="py-28 bg-[#FFFFFF] px-6 text-center relative z-10">
-              <h2 className="font-['Alex_Brush'] text-[3.5rem] text-[#C5A059] mb-12 select-none">Visolgacha Qolgan Vaqt</h2>
-
-              <div className="flex justify-center gap-3">
-                {[
-                  { label: 'KUN', value: timeLeft.kun },
-                  { label: 'SOAT', value: timeLeft.soat },
-                  { label: 'DAQIQA', value: timeLeft.daqiqa },
-                  { label: 'SONIYA', value: timeLeft.soniya }
-                ].map((item, index) => (
-                  <div key={index} className="flex flex-col items-center bg-[#FAF9F5] w-[75px] py-5 rounded-2xl border border-gray-100 shadow-sm">
-                    <span className="font-['Playfair_Display'] text-[26px] text-[#111] font-medium mb-0.5">{item.value.toString().padStart(2, '0')}</span>
-                    <span className="font-['Montserrat'] text-[7.5px] tracking-widest text-gray-400 font-bold">{item.label}</span>
-                  </div>
-                ))}
+            {/* FINAL BADGE */}
+            <section className="py-32 px-6 bg-[#FCFBF9] text-center border-t border-[#ECEAE4]">
+              <div className="max-w-[260px] mx-auto space-y-6">
+                <h1 className="font-decorative text-2xl font-bold tracking-[0.3em] text-[#0A0A0A]">S & A</h1>
+                <div className="h-[1px] w-6 bg-[#C5A880] mx-auto" />
+                <p className="font-syne text-[8px] tracking-[0.5em] text-[#999] uppercase">END OF EXHIBITION</p>
               </div>
             </section>
 
-            {/* ULTRA LUXURY FOOTER BRANDING */}
-            <footer className="py-16 text-center bg-[#070707] border-t border-white/[0.04] relative z-10">
-              <p className="font-['Montserrat'] text-[9px] tracking-[0.6em] text-[#C5A059] uppercase font-bold mb-4">
-                DESIGNED BY <Link href="https://webleaders.uz" className="hover:opacity-80 transition-opacity">WEBLEADERS</Link>
-              </p>
-              <p className="font-['Montserrat'] text-[7px] tracking-[0.25em] text-gray-600 uppercase">
-                DIGITAL EXPERIMENTAL ARCHITECTURE © 2026
+            {/* COUTURE FOOTER */}
+            <footer className="py-8 bg-[#FAF9F6] text-center border-t border-[#ECEAE4]/60">
+              <p className="font-syne text-[7px] tracking-[0.6em] uppercase text-zinc-400">
+                Architected by <Link href="https://webleaders.uz" target="_blank" className="text-[#0A0A0A] font-bold underline">WebLeaders Labs</Link>
               </p>
             </footer>
 
@@ -553,4 +460,4 @@ const UltraLuxuryWedding: NextPage = () => {
   );
 };
 
-export default UltraLuxuryWedding;
+export default LiquidLiquidWedding;
