@@ -144,7 +144,7 @@ const CountdownTimer = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const weddingDate = new Date('2026-07-08T10:00:00');
+    const weddingDate = new Date('2026-07-08T10:00:00'); // Qiz bazmi — first event
     const update = () => {
       const diff = weddingDate.getTime() - Date.now();
       if (diff <= 0) { setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 }); return; }
@@ -285,8 +285,11 @@ const LuxuryWedding: NextPage = () => {
   };
 
   const handleAddToCalendar = () => {
-    const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Gulzoda va Davron To'yi")}&dates=20260708T100000/20260708T230000&details=${encodeURIComponent("Qiz bazmi va Visol oqshomi")}&location=${encodeURIComponent('Angren shahri')}&sf=true&output=xml`;
-    window.open(url, '_blank');
+    // Open both events separately so the guest has both in their calendar
+    const qizBazmi = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Gulzoda & Davron — Qiz Bazmi")}&dates=20260708T100000/20260708T160000&details=${encodeURIComponent("Gulzoda va Davronning qiz bazmi")}&location=${encodeURIComponent('"Angren Land" to\'yxonasi, Angren shahri')}&sf=true&output=xml`;
+    const visolOqshomi = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Gulzoda & Davron — Visol Oqshomi (Katta To'y)")}&dates=20260710T180000/20260710T230000&details=${encodeURIComponent("Gulzoda va Davronning visol oqshomi — katta to'y")}&location=${encodeURIComponent('"Osiyo" to\'yxonasi, Angren shahri')}&sf=true&output=xml`;
+    window.open(qizBazmi, '_blank');
+    setTimeout(() => window.open(visolOqshomi, '_blank'), 500);
   };
 
   return (
@@ -497,7 +500,7 @@ const LuxuryWedding: NextPage = () => {
                   <div className="flex items-center gap-4">
                     <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#C8607A]" />
                     <div className="text-center space-y-1">
-                      <p className="font-sans-lux text-[11px] tracking-[0.45em] text-[#3D2B2E] font-medium">08 · 07 · 2026</p>
+                      <p className="font-sans-lux text-[11px] tracking-[0.45em] text-[#3D2B2E] font-medium">08 · 07 &amp; 10 · 07 · 2026</p>
                       <p className="font-sans-lux text-[8.5px] tracking-[0.32em] text-[#4A7C59] uppercase">Angren shahri</p>
                     </div>
                     <div className="h-px w-10 bg-gradient-to-l from-transparent to-[#C8607A]" />
@@ -566,7 +569,7 @@ const LuxuryWedding: NextPage = () => {
                 </div>
 
                 <p className="font-serif-lux italic text-[13px] text-[#3D2B2E]/45 tracking-wide">
-                  08 Iyul, 2026 · Angren shahri
+                  08 Iyul — Qiz Bazmi · 10 Iyul — Katta To'y
                 </p>
               </motion.div>
             </section>
@@ -657,14 +660,14 @@ const LuxuryWedding: NextPage = () => {
                       <Sparkles size={42} className="text-[#C8607A]" />
                     </div>
                     <div className="space-y-2 relative z-10">
-                      <p className="font-sans-lux text-[8px] tracking-[0.4em] uppercase text-[#4A7C59]">Birinchi Tadbir</p>
+                      <p className="font-sans-lux text-[8px] tracking-[0.4em] uppercase text-[#4A7C59]">08 Iyul · Birinchi Tadbir</p>
                       <p className="font-display-lux text-[3.2rem] text-[#C8607A] font-light tracking-wide leading-none py-1">10:00</p>
                       <div className="w-10 h-px bg-gradient-to-r from-transparent via-[#C8607A]/45 to-transparent mx-auto my-3" />
                       <p className="font-sans-lux text-[11px] tracking-[0.22em] uppercase text-[#3D2B2E] font-bold">Qiz Bazmi</p>
                       <p className="font-serif-lux italic text-[14px] text-[#3D2B2E]/62">"Angren Land" to'yxonasi</p>
                       <div className="pt-3 flex items-center justify-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#C8607A]/35" />
-                        <span className="font-sans-lux text-[8.5px] text-[#3D2B2E]/38 tracking-wider">Soat 10:00 dan boshlab</span>
+                        <span className="font-sans-lux text-[8.5px] text-[#3D2B2E]/38 tracking-wider">8 Iyul · Soat 10:00 dan boshlab</span>
                         <div className="w-1.5 h-1.5 rounded-full bg-[#C8607A]/35" />
                       </div>
                     </div>
@@ -690,14 +693,14 @@ const LuxuryWedding: NextPage = () => {
                       <Heart size={42} className="text-[#C8607A]" />
                     </div>
                     <div className="space-y-2 relative z-10">
-                      <p className="font-sans-lux text-[8px] tracking-[0.4em] uppercase text-[#4A7C59]">Ikkinchi Tadbir</p>
+                      <p className="font-sans-lux text-[8px] tracking-[0.4em] uppercase text-[#4A7C59]">10 Iyul · Katta To'y</p>
                       <p className="font-display-lux text-[3.2rem] text-[#C8607A] font-light tracking-wide leading-none py-1">18:00</p>
                       <div className="w-10 h-px bg-gradient-to-r from-transparent via-[#C8607A]/45 to-transparent mx-auto my-3" />
                       <p className="font-sans-lux text-[11px] tracking-[0.22em] uppercase text-[#3D2B2E] font-bold">Visol Oqshomi</p>
                       <p className="font-serif-lux italic text-[14px] text-[#3D2B2E]/62">"Osiyo" to'yxonasi</p>
                       <div className="pt-3 flex items-center justify-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#C8607A]/35" />
-                        <span className="font-sans-lux text-[8.5px] text-[#3D2B2E]/38 tracking-wider">Soat 18:00 dan boshlab</span>
+                        <span className="font-sans-lux text-[8.5px] text-[#3D2B2E]/38 tracking-wider">10 Iyul · Soat 18:00 dan boshlab</span>
                         <div className="w-1.5 h-1.5 rounded-full bg-[#C8607A]/35" />
                       </div>
                     </div>
