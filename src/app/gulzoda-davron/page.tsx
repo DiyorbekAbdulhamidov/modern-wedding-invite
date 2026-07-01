@@ -1038,7 +1038,7 @@ const LuxuryWedding: NextPage = () => {
                   Created with passion by
                 </span>
                 <span className="font-sans-lux text-[13px] text-[#C8607A] font-bold tracking-[0.22em]">
-                  WEBLEADERS.UZ
+                  WEBLEADERS.UZ the best
                 </span>
               </motion.a>
             </section>
@@ -1049,5 +1049,5 @@ const LuxuryWedding: NextPage = () => {
     </div>
   );
 };
-// 
+
 export default LuxuryWedding;
