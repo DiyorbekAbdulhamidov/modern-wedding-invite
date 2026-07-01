@@ -1049,6 +1049,5 @@ const LuxuryWedding: NextPage = () => {
     </div>
   );
 };
-
-export default LuxuryWedding;
 // 
+export default LuxuryWedding;
